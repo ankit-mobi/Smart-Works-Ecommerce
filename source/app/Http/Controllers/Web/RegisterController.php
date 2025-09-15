@@ -32,6 +32,9 @@ class RegisterController extends Controller
                 ->where('set_id', '1')
                 ->first();	
 
+         $firebase = DB::table('firebase')
+            ->first();
+
         $this->validate(
             $request,
             [
@@ -55,9 +58,22 @@ class RegisterController extends Controller
         $created_at = Carbon::now();
         $updated_at = Carbon::now();
 
+        // if user already present but not verified then delete that user and reinsert
         $checkUser = DB::table('users')
             ->where('user_phone', $user_phone)
             ->first();
+          if ($checkUser && $checkUser->is_verified == 0) {
+            $delnot = DB::table('notificationby')
+                ->where('user_id', $checkUser->user_id)
+                ->delete();
+
+            $delUser = DB::table('users')
+                ->where('user_phone', $user_phone)
+                ->delete();
+        }
+
+
+        // checks sms by
         $smsby = DB::table('smsby')
             ->first();
 
@@ -229,8 +245,14 @@ class RegisterController extends Controller
         }
     }
 
+    // verify otp for registeraion
     public function web_verify_otp(Request $request)
     {
+        $request->validate([
+            'user_phone' => 'required|numeric', 
+            'otp' => 'required',
+        ]);
+        
         $phone = $request->user_phone;
         $otp = $request->otp;
         $smsby = DB::table('smsby')
@@ -276,71 +298,7 @@ class RegisterController extends Controller
     }
 
 
-    // public function login(Request $request)
-
-    // {
-    //     $user_phone = $request->user_phone;
-    //     $user_password = $request->user_password;
-    //     $device_id = $request->device_id;
-
-    //     $checkUserReg = DB::table('users')
-    //         ->where('user_phone', $user_phone)
-    //         ->first();
-
-    //     if (!($checkUserReg) || $checkUserReg->is_verified == 0) {
-    //         $message = array('status' => '0', 'message' => 'Phone not registered', 'data' => []);
-    //         return $message;
-    //     }
-
-    //     $checkUser = DB::table('users')
-    //         ->where('user_phone', $user_phone)
-    //         ->where('user_password', $user_password)
-    //         ->first();
-
-    //     if ($checkUser) {
-
-    //         if ($checkUser->is_verified == 0) {
-    //             $chars = "0123456789";
-    //             $otpval = "";
-    //             for ($i = 0; $i < 4; $i++) {
-    //                 $otpval .= $chars[mt_rand(0, strlen($chars) - 1)];
-    //             }
-
-    //             $otpmsg = $this->otpmsg($otpval, $user_phone);
-
-    //             $updateOtp = DB::table('users')
-    //                 ->where('user_phone', $user_phone)
-    //                 ->update(['otp_value' => $otpval]);
-
-    //             $checkUser1 = DB::table('users')
-    //                 ->where('user_phone', $user_phone)
-    //                 ->first();
-
-    //             $message = array('status' => '2', 'message' => 'Verify Phone', 'data' => [$checkUser1]);
-    //             return $message;
-    //         } else {
-    //             $updateDeviceId = DB::table('users')
-    //                 ->where('user_phone', $user_phone)
-    //                 ->update(['device_id' => $device_id]);
-
-    //             $checkUser1 = DB::table('users')
-    //                 ->where('user_phone', $user_phone)
-    //                 ->where('user_password', $user_password)
-    //                 ->first();
-
-    //             $message = array('status' => '1', 'message' => 'login successfully', 'data' => [$checkUser1]);
-    //             return $message;
-    //         }
-    //     } else {
-    //         $message = array('status' => '0', 'message' => 'Wrong Password', 'data' => []);
-    //         return $message;
-    //     }
-    // }
-
-
-
-
-    public function myprofile(Request $request)
+    /*public function myprofile(Request $request)
     {
         $user_id = $request->user_id;
         $user =  DB::table('users')
@@ -354,106 +312,9 @@ class RegisterController extends Controller
             $message = array('status' => '0', 'message' => 'User not found', 'data' => []);
             return $message;
         }
-    }
+    } 
 
-    public function forgotPassword(Request $request)
-    {
-        $user_phone = $request->user_phone;
-
-        $checkUser = DB::table('users')
-            ->where('user_phone', $user_phone)
-            ->where('is_verified', 1)
-            ->first();
-
-        if ($checkUser) {
-            $chars = "0123456789";
-            $otpval = "";
-            for ($i = 0; $i < 4; $i++) {
-                $otpval .= $chars[mt_rand(0, strlen($chars) - 1)];
-            }
-
-            $otpmsg = $this->otpmsg($otpval, $user_phone);
-
-            $updateOtp = DB::table('users')
-                ->where('user_phone', $user_phone)
-                ->update(['otp_value' => $otpval]);
-
-            if ($updateOtp) {
-                $checkUser1 = DB::table('users')
-                    ->where('user_phone', $user_phone)
-                    ->first();
-
-                $message = array('status' => '1', 'message' => 'Verify OTP', 'data' => [$checkUser1]);
-                return $message;
-            } else {
-                $message = array('status' => '0', 'message' => 'Something wrong', 'data' => []);
-                return $message;
-            }
-        } else {
-            $message = array('status' => '0', 'message' => 'User not registered', 'data' => []);
-            return $message;
-        }
-    }
-
-    public function verifyOtp(Request $request)
-    {
-        $phone = $request->user_phone;
-        $otp = $request->otp;
-
-        // check for otp verify
-        $getUser = DB::table('users')
-            ->where('user_phone', $phone)
-            ->first();
-
-        if ($getUser) {
-            $getotp = $getUser->otp_value;
-
-            if ($otp == $getotp) {
-                $message = array('status' => 1, 'message' => "Otp Matched Successfully");
-                return $message;
-            } else {
-                $message = array('status' => 0, 'message' => "Wrong OTP");
-                return $message;
-            }
-        } else {
-            $message = array('status' => 0, 'message' => "User not registered");
-            return $message;
-        }
-    }
-
-    public function changePassword(Request $request)
-    {
-        $user_phone = $request->user_phone;
-        $password = $request->user_password;
-
-        $getUser = DB::table('users')
-            ->where('user_phone', $user_phone)
-            ->first();
-
-        if ($getUser) {
-            $updateOtp = DB::table('users')
-                ->where('user_phone', $user_phone)
-                ->update(['user_password' => $password]);
-
-            if ($updateOtp) {
-                $checkUser1 = DB::table('users')
-                    ->where('user_phone', $user_phone)
-                    ->first();
-
-                $message = array('status' => '1', 'message' => 'Password changed', 'data' => [$checkUser1]);
-                return $message;
-            } else {
-                $message = array('status' => '0', 'message' => 'Something wrong', 'data' => []);
-                return $message;
-            }
-        } else {
-            $message = array('status' => 0, 'message' => "User not registered");
-            return $message;
-        }
-    }
-
-
-    public function profile_edit(Request $request)
+     public function profile_edit(Request $request)
     {
         $user_id = $request->user_id;
         $user_name = $request->user_name;
@@ -534,4 +395,5 @@ class RegisterController extends Controller
             return $message;
         }
     }
+        */
 }

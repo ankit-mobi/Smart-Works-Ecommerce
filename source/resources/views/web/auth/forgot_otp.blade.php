@@ -18,7 +18,7 @@
 
     <p style="color: gray;">Please enter the 4-digit OTP sent to your phone.</p>
 
-    <form class="login100-form validate-form" method="POST" action="{{ route('forgot_password.sendOtp')}}">
+    <form class="login100-form validate-form" method="POST" action="{{ route('forgot_password.verifyOtp')}}">
         {{ csrf_field() }}
         <div class="row" style="margin-top: 20px;">
             <div class="col-lg-12">

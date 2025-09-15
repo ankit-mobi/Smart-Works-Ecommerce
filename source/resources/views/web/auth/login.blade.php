@@ -58,7 +58,8 @@
 
 
 
-<button class="btn" style="background-color: #FB641B;color: white;width: 48%;font-size: 17px;margin-top: 20px;display: inline-block;" type="submit">Login</button>   <p style="width: 45%;display: inline-block;margin-left: 8px;top: 10px;position: relative;"><a href="{{ route('forgot_password.form') }}" style="color: black">Forgot Password?</a></p>
+<button class="btn" style="background-color: #FB641B;color: white;width: 48%;font-size: 17px;margin-top: 20px;display: inline-block;" type="submit">Login</button>   <p style="width: 45%;display: inline-block;margin-left: 8px;top: 10px;position: relative;">
+  <a href="{{ route('forgot_password.form') }}" style="color: black">Forgot Password?</a></p>
 </form>
 
 <p style="color: gray;margin-top: 30px;">New To {{$logo->name}} <a href="{{ route('userregister') }}" style="color:#FB641B; "> SIGN UP</a></p>

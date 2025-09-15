@@ -1,37 +1,37 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Web;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use DB;
 
-class SearchController extends Controller
+class WebSearchController extends Controller
 {
- 
-    public function search(Request $request)
+     public function search_web(Request $request)
     {
         $keyword = $request->keyword;
-         $lat = $request->lat;
-       $lng = $request->lng;
+    //      $lat = $request->lat;
+    //    $lng = $request->lng;
        
-       $nearbystore = DB::table('store')
-                    ->select('del_range','store_id',DB::raw("6371 * acos(cos(radians(".$lat . ")) 
-                    * cos(radians(store.lat)) 
-                    * cos(radians(store.lng) - radians(" . $lng . ")) 
-                    + sin(radians(" .$lat. ")) 
-                    * sin(radians(store.lat))) AS distance"))
-                  ->where('store.del_range','>=','distance')
-                //   ->where('store.city',$city)
-                  ->orderBy('distance')
-                  ->first();
-    if($nearbystore->del_range >= $nearbystore->distance)  { 
+    //    $nearbystore = DB::table('store')
+    //                 ->select('del_range','store_id',DB::raw("6371 * acos(cos(radians(".$lat . ")) 
+    //                 * cos(radians(store.lat)) 
+    //                 * cos(radians(store.lng) - radians(" . $lng . ")) 
+    //                 + sin(radians(" .$lat. ")) 
+    //                 * sin(radians(store.lat))) AS distance"))
+    //               ->where('store.del_range','>=','distance')
+    //             //   ->where('store.city',$city)
+    //               ->orderBy('distance')
+    //               ->first();
+    if(true) 
+         { //$nearbystore->del_range >= $nearbystore->distance
         $prod = DB::table('store_products')
                  ->join ('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
 			     ->join ('product', 'product_varient.product_id', '=', 'product.product_id')
 			     ->select('product.product_name','product.product_id')
                  ->groupBy('product.product_name','product.product_id')
-                 ->where('store_products.store_id', $nearbystore->store_id)
+                //  ->where('store_products.store_id', $nearbystore->store_id)
                 ->where('product.product_name', 'like', '%'.$keyword.'%')
                 ->get();
 
@@ -64,9 +64,9 @@ class SearchController extends Controller
             return $message;
         }
       }
-       else{
-           $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
-            return $message; 
-       }
+    //    else{
+    //        $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
+    //         return $message; 
+    //    }
     }
 }

@@ -62,20 +62,17 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::get('sign-up', 'RegisterController@register_user')->name('userregister');
 	Route::post('registration', 'RegisterController@usersignup')->name('user_registration');
 	Route::post('registration/otp_verify', 'RegisterController@web_verify_otp')->name('web_verify_otp');
-
 	// For login  // Auth //pre
 	Route::get('login', 'UserloginController@userlogin')->name('userLogin');
 	Route::post('custloginCheck', 'UserloginController@logincheck')->name('custLoginCheck');
-
 	// Forgot Password
 	Route::get('forgot-password', 'ForgotPasswordController@showforgotForm')->name('forgot_password.form');
-	Route::post('forgot-password', 'ForgotPasswordController@forgotPassword')->name('forgotPassword');
-	Route::post('forgot-password', 'ForgotPasswordController@sendOtp')->name('forgot_password.verifyOtp');
-	// Route::post('reset-password', 'ForgotPasswordController@resetPassword')->name('reset_password');
+	Route::post('forgot-password-details', 'ForgotPasswordController@forgotPassword')->name('forgot_password.detail');
+	Route::post('forgot-password', 'ForgotPasswordController@verifyForgotOtp')->name('forgot_password.verifyOtp');
+	Route::post('reset-password', 'ForgotPasswordController@resetPassword')->name('reset_password');
 
-
-
-
+	//Search bar
+	Route::get('search', 'AllProductController@search_web')->name('search.product');
 
 
 
@@ -114,6 +111,12 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	// --------------------------
 	// Auth protected
 	Route::group(['middleware' => 'bamaCust'], function () {
+
+		// Profile
+		Route::get('profile', 'WebUserController@profile')->name('profile');
+		// profile edit
+		Route::post('profile/update', 'UserController@update')->name('profile.update');
+
 		
 		// Coupons
 		// Route::post('coupon/apply', 'CouponController@apply')->name('coupon.apply');
@@ -131,9 +134,6 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 
 
 
-		// Profile
-		Route::get('profile', 'WebUserController@profile')->name('profile');
-		Route::post('profile/update', 'UserController@update')->name('profile.update');
 
 		// Address Management
 		Route::get('address', 'AddressController@index')->name('address.index');

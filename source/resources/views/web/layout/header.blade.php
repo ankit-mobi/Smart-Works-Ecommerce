@@ -29,14 +29,18 @@
                 </li>
             </ul>
 
-            <form class="d-flex mx-lg-auto my-2 my-lg-0 w-lg-50">
-                <div class="input-group">
-                    <input class="form-control" type="search" placeholder="Search products..." aria-label="Search">
-                    <button class="btn btn-primary" type="submit">
-                        <i class="fas fa-search"></i> {{-- Font Awesome Search Icon --}}
-                    </button>
-                </div>
-            </form>
+            <form class="d-flex mx-lg-auto my-2 my-lg-0 w-lg-50" action="{{ route('search.product') }}" method="GET">
+    <div class="input-group">
+        <input id="searchInput" name="keyword" class="form-control" type="search"
+               placeholder="Search products..." aria-label="Search" required>
+        <button class="btn btn-primary" type="submit">
+            <i class="fas fa-search"></i>
+        </button>
+        <button class="btn btn-outline-secondary" type="button" id="voiceSearchBtn">
+            <i class="fas fa-microphone"></i>
+        </button>
+    </div>
+</form>
 
             <ul class="navbar-nav ms-lg-auto d-flex flex-row align-items-center">
                 {{-- User Profile/Login --}}
@@ -230,5 +234,33 @@ $(document).ready(function() {
         });
     });
 });
+</script>
+
+<script>
+    // Voice Search (Web Speech API)
+    const voiceBtn = document.getElementById('voiceSearchBtn');
+    const searchInput = document.getElementById('searchInput');
+
+    if ('webkitSpeechRecognition' in window) {
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-US";
+
+        voiceBtn.addEventListener('click', () => {
+            recognition.start();
+        });
+
+        recognition.onresult = (event) => {
+            searchInput.value = event.results[0][0].transcript;
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Voice search error:", event.error);
+        };
+    } else {
+        voiceBtn.disabled = true; // If browser doesn’t support speech API
+        voiceBtn.title = "Voice search not supported in this browser";
+    }
 </script>
 

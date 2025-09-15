@@ -1,7 +1,7 @@
 @extends('web.layout.app')
 
 @section('content')
-  <br><br><br>
+  
 
   {{-- Main container for the product listing page --}}
   <div class="container-fluid py-4">
@@ -119,7 +119,7 @@
         </div>
 
         {{-- Product grid --}}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {{-- <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           @if(count($products) > 0)
             @foreach($products as $product)
               <div class="col mb-4">
@@ -158,7 +158,211 @@
               </div>
             @endforeach
           @endif
+        </div> --}}
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {{-- ✅ If search results exist --}}
+    @if(isset($prod) && count($prod) > 0)
+        @foreach($prod as $product)
+            <div class="col mb-4">
+                <div class="card h-100 product-card shadow-sm">
+                    <a href="{{ route('product_detail', ['id' => $product->product_id]) }}"
+                       class="text-decoration-none text-dark">
+                        @if(isset($product->varients[0]))
+                            <img src="{{ asset($product->varients[0]->varient_image) }}" 
+                                 class="card-img-top p-3 product-image" 
+                                 alt="{{ $product->product_name }}">
+                        @else
+                            <img src="{{ asset('images/no-image.png') }}" 
+                                 class="card-img-top p-3 product-image" 
+                                 alt="No Image">
+                        @endif
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title product-name">{{ $product->product_name }}</h6>
+                        @if(isset($product->varients[0]))
+                            <p class="card-text text-muted small mb-1">{{ $product->varients[0]->description }}</p>
+                            <h5 class="product-price font-weight-bold">₹{{ $product->varients[0]->price }}</h5>
+                        @endif
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            @csrf
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-secondary"><i class="fas fa-minus"></i></button>
+                                <button type="button" class="btn btn-outline-secondary">1</button>
+                                <button type="button" class="btn btn-outline-secondary"><i class="fas fa-plus"></i></button>
+                            </div>
+                            @if(isset($product->varients[0]))
+                                <button class="btn add-to-cart-btn" 
+                                        data-varient-id="{{ $product->varients[0]->varient_id }}" 
+                                        data-qty="1">
+                                    Add to Cart
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+
+        {{-- ✅ Product Preview Page --}}
+@elseif(isset($product) && !empty($product))
+<div class="container my-5">
+    <div class="row g-5">
+        {{-- Product Image Section --}}
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <div class="product-image-container p-4 border rounded shadow-sm">
+                <img src="{{ asset($product->product_image) }}" 
+                     class="img-fluid rounded"
+                     alt="{{ $product->product_name }}">
+            </div>
         </div>
+
+        <div class="col-md-6">
+            <div class="product-details-container p-4 border rounded shadow-sm">
+                <h1 class="product-name display-5">{{ $product->product_name }}</h1>
+                <p class="product-description lead text-muted mt-3">{{ $product->description }}</p>
+
+                <div class="product-price-section my-4">
+                    @if($product->base_price < $product->base_mrp)
+                        <span class="product-price h3 text-success me-2">
+                            ₹{{ number_format($product->base_price, 2) }}
+                        </span>
+                        <span class="product-mrp text-muted text-decoration-line-through">
+                            ₹{{ number_format($product->base_mrp, 2) }}
+                        </span>
+                    @else
+                        <span class="product-price h3">
+                            ₹{{ number_format($product->base_mrp, 2) }}
+                        </span>
+                    @endif
+                </div>
+
+                {{-- Quantity & Buttons --}}
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <label for="quantity" class="me-3 fw-bold">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" 
+                               class="form-control" style="width: 80px;">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary btn-lg w-100 add-to-cart-btn"
+                                data-varient-id="{{ $product->varient_id }}" data-qty="1">
+                            Add to Cart
+                        </button>
+                        <br><br>
+                        <a href="{{ route('checkout', $product->product_id) }}" 
+                           class="btn btn-success btn-lg w-100">
+                            Buy Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    {{-- Product Details --}}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Product Details</h4>
+                    <p class="card-text text-muted">{{ $product->description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    {{-- Related Products --}}
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">Related Products</h3>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                @foreach ($related_prods as $related_prod)
+                    <div class="col">
+                        <div class="card h-100 product-card shadow-sm border-0">
+                            <a href="{{ route('product_detail', ['id' => $related_prod->product_id]) }}" class="d-block">
+                                <img src="{{ asset($related_prod->product_image) }}" 
+                                     class="card-img-top img-fluid rounded-top"
+                                     alt="{{ $related_prod->product_name }}">
+                            </a>
+                            <div class="card-body text-center d-flex flex-column">
+                                <h5 class="card-title">
+                                    <a href="{{ route('product_detail', ['id' => $related_prod->product_id]) }}" 
+                                       class="text-dark text-decoration-none">
+                                        {{ $related_prod->product_name }}
+                                    </a>
+                                </h5>
+                                <div class="mt-auto">
+                                    <span class="fw-bold">
+                                        ₹{{ number_format($related_prod->base_mrp, 2) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    {{-- ✅ Else: Show default product listing --}}
+    @elseif(isset($products) && count($products) > 0)
+        @foreach($products as $product)
+            <div class="col mb-4">
+                <div class="card h-100 product-card shadow-sm">
+                    <a href="{{ route('product_detail', ['id' => $product->product_id]) }}"
+                       class="text-decoration-none text-dark">
+                        <img src="{{ asset($product->product_image) }}" 
+                             class="card-img-top p-3 product-image" 
+                             alt="{{ $product->product_name }}">
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title product-name">{{ $product->product_name }}</h6>
+                        @foreach($prod_variant as $variant)
+                            @if($variant->product_id == $product->product_id)
+                                <p class="card-text text-muted small mb-1">{{ $variant->description }}</p>
+                                <h5 class="product-price font-weight-bold">₹{{ $variant->base_price }}</h5>
+                                @break
+                            @endif
+                        @endforeach
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            @csrf
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-secondary"><i class="fas fa-minus"></i></button>
+                                <button type="button" class="btn btn-outline-secondary">1</button>
+                                <button type="button" class="btn btn-outline-secondary"><i class="fas fa-plus"></i></button>
+                            </div>
+                            @if(isset($variant))
+                                <button class="btn add-to-cart-btn" 
+                                        data-varient-id="{{ $variant->varient_id }}" 
+                                        data-qty="1">
+                                    Add to Cart
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @else
+        <div class="col-12">
+            <p class="text-center text-muted">No products available.</p>
+        </div>
+    @endif
+</div>
+
       </div>
     </div>
   </div>

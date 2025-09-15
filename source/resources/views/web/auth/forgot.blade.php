@@ -10,8 +10,8 @@
     </div>
   </div>
   
-  
-  <form class="login100-form validate-form" method="POST" action="{{ route('forgotPassword') }}"> {{-- route('forgotPassword') --}}
+ 
+  <form class="login100-form validate-form" method="POST" action="{{ route('forgot_password.detail')}}"> 
     {{ csrf_field() }}
     <div class="row" style="margin-top: 20px;">
       <div class="col-sm-7" style="border-right: 1px solid #CCCCCC">
@@ -49,7 +49,7 @@
         </div>
 
         <button class="btn" style="background-color: #FB641B;color: white;width: 48%;font-size: 17px;margin-top: 20px;display: inline-block;" type="submit">Submit</button>
-
+  </form>
       </div>
 
       <div class="col-sm-5">
@@ -84,7 +84,7 @@
         </div>
       </div>
     </div>
-  </form>
+
 </div>
 <br>
 

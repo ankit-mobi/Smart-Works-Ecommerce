@@ -33,7 +33,7 @@ class ForgotPasswordController extends Controller
             ->where('set_id', '1')
             ->first();
 
-          $this->validate(
+        $this->validate(
             $request,
             [
                 'user_phone' => 'required|numeric',
@@ -50,6 +50,10 @@ class ForgotPasswordController extends Controller
             ->where('is_verified', 1)
             ->first();
 
+        if (!($checkUser)) {
+            return redirect()->route('forgot_password.form')->withErrors('Phone not registered');
+        }
+
         if ($checkUser) {
             $chars = "0123456789";
             $otpval = "";
@@ -60,17 +64,13 @@ class ForgotPasswordController extends Controller
             $otpmsg = $this->otpmsg($otpval, $user_phone);
 
 
-
             $updateOtp = DB::table('users')
                 ->where('user_phone', $user_phone)
                 ->update(['otp_value' => $otpval]);
 
             if ($updateOtp) {
-                $checkUser1 = DB::table('users')
-                    ->where('user_phone', $user_phone)
-                    ->first();
 
-                return view('web.auth.forgot_otp', compact('title','logo','user_phone'))->with('otp', $otpval);
+                return view('web.auth.forgot_otp', compact('title', 'logo', 'user_phone'))->with('otp', $otpval);
             } else {
                 return redirect()->route('forgot_password.form')->withErrors('Something went wrong');
             }
@@ -79,29 +79,79 @@ class ForgotPasswordController extends Controller
         }
     }
 
-      public function verifyOtp(Request $request)
+    public function verifyForgotOtp(Request $request)
     {
-        $phone = $request->user_phone;
+        $title = "Home";
+        $logo = DB::table('tbl_web_setting')
+            ->where('set_id', '1')
+            ->first();
+
+        $request->validate([
+            'user_phone' => 'required|numeric', 
+            'otp' => 'required',
+        ]);
+        $user_phone = $request->user_phone;
         $otp = $request->otp;
 
         // check for otp verify
         $getUser = DB::table('users')
-            ->where('user_phone', $phone)
+            ->where('user_phone', $user_phone)
             ->first();
 
         if ($getUser) {
             $getotp = $getUser->otp_value;
 
             if ($otp == $getotp) {
-                $message = array('status' => 1, 'message' => "Otp Matched Successfully");
-                return $message;
+                return view('web.auth.changepassword', compact('title', 'logo'))->with('user_phone', $user_phone);
             } else {
-                $message = array('status' => 0, 'message' => "Wrong OTP");
-                return $message;
+                return redirect()->route('forgot_password.form')->withErrors('Wrong OTP');
             }
         } else {
-            $message = array('status' => 0, 'message' => "User not registered");
-            return $message;
+            return redirect()->route('forgot_password.form')->withErrors('Wrong OTP');
         }
     }
+
+
+    public function resetPassword(Request $request)
+    {
+
+          $this->validate(
+            $request,
+            [
+                'user_phone' => 'required',
+                'user_password' => 'required'
+            ],
+            [
+                'user_phone.required' => 'Enter Mobile...',
+                'user_password.required' => 'Enter password...',
+            ]
+        );
+
+        $user_phone = $request->user_phone;
+        $password = $request->user_password;
+
+        $getUser = DB::table('users')
+            ->where('user_phone', $user_phone)
+            ->first();
+
+        if ($getUser) {
+            $updateOtp = DB::table('users')
+                ->where('user_phone', $user_phone)
+                ->update(['user_password' => $password]);
+
+            if ($updateOtp) {
+                $checkUser1 = DB::table('users')
+                    ->where('user_phone', $user_phone)
+                    ->first();
+
+                return redirect()->route('userLogin')->with('success', "password changed");
+            } else {
+                return redirect()->route('userLogin')->with('errors', "Something wrong");
+            }
+        } else {
+           return redirect()->route('userLogin')->with('errors', "Something wrong");
+        }
+    }
+
+    
 }
