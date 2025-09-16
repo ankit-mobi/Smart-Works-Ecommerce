@@ -12,6 +12,8 @@
 |
 */
 
+use FontLib\Table\Type\name;
+
 Route::get('/clear-cache', function () {
 	Artisan::call('config:cache');
 	return "Cache is cleared";
@@ -90,6 +92,10 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::get('products/{cat_id}', 'AllProductController@cate')->name('catee'); //pre
 	Route::get('product/{id}', 'AllProductController@product_details')->name('product_detail');
 	Route::post('search', 'AllProductController@search')->name('search');
+
+	// Route::get('top_selling', 'WebOrderController@top_selling')->name('topSelling'); route not used but controller is used
+	//    Route::get('dealproduct', 'WebCategoryController@dealproduct');
+	Route::get('whatsnew', 'WebOrderController@whatsnew');
 
 
 	// Route for adding a product to the cart

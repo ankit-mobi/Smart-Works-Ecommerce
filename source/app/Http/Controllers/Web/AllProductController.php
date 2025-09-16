@@ -37,6 +37,10 @@ class AllProductController extends Controller
             ->get();
 
         $keyword = $request->keyword;
+        
+         // this show all data of all categories
+        $products = DB::table('product')
+            ->get();
     //      $lat = $request->lat;
     //    $lng = $request->lng;
        
@@ -90,17 +94,13 @@ class AllProductController extends Controller
          return view('web.product.cat_product', compact("title","logo", "category", "category_sub", "category_child", "prod_variant", 'cust', 'cust_phone','prod'));
         }
         else{
-              return response()->json([
-        'status' => 0,
-        'message' => 'Products not found',
-        'data' => []
-    ]);
+              return view('web.product.cat_product', compact("title","logo", "category", "category_sub", "category_child", "products", "prod_variant", 'cust', 'cust_phone'))->withErrors('No Products Found');
         }
       }
-       else{
-           $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
-            return $message; 
-       }
+    //    else{
+    //        $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
+    //         return $message; 
+    //    }
     }
 
     public function products(Request $request)
@@ -166,54 +166,55 @@ class AllProductController extends Controller
     }
 
     
-    public function latest_category_three()   //top category it fetchs 6 category
-    {
-        $latest_category = DB::table('categories')
-            ->orderBy('cat_id', 'desc')
-            ->take(6)
-            ->get();
+    // public function latest_category_three()   //top category it fetchs 6 category
+    // {
+    //     $latest_category = DB::table('categories')
+    //         ->orderBy('cat_id', 'desc')
+    //         ->take(6)
+    //         ->get();
 
-        return $latest_category;
-    }
+    //     return $latest_category;
+    // }
 
-    public function deal_products()
-    {
-        $deal_products  = DB::table('deal_product')
-            ->join('product_varient', 'deal_product.varient_id', '=', 'product_varient.varient_id')
-            ->join('product', 'product_varient.product_id', '=', 'product.product_id')
-            ->join('categories', 'product.cat_id', '=', 'categories.cat_id')
-            ->select(
-                'deal_product.*',
-                'product_varient.varient_image',
-                'product_varient.base_mrp',
-                'product_varient.base_price',
-                'product.product_name',
-                'product.product_id',
-                'categories.title'
-            )
-            ->orderBy('deal_product.deal_id', 'desc')
-            ->get();
+    // public function deal_products()
+    // {
+    //     $deal_products  = DB::table('deal_product')
+    //         ->join('product_varient', 'deal_product.varient_id', '=', 'product_varient.varient_id')
+    //         ->join('product', 'product_varient.product_id', '=', 'product.product_id')
+    //         ->join('categories', 'product.cat_id', '=', 'categories.cat_id')
+    //         ->select(
+    //             'deal_product.*',
+    //             'product_varient.varient_image',
+    //             'product_varient.base_mrp',
+    //             'product_varient.base_price',
+    //             'product.product_name',
+    //             'product.product_id',
+    //             'categories.title'
+    //         )
+    //         ->orderBy('deal_product.deal_id', 'desc')
+    //         ->get();
 
-        return $deal_products;
-    }
+    //     return $deal_products;
+    // }
 
     //Just Arrived Products
-    public function latest_products()
-    {
-        $latest_products = DB::table('product')
-            ->join('product_varient', 'product_varient.product_id', '=', 'product.product_id')
-            ->select(
-                'product.*',
-                'product_varient.base_mrp',
-                'product_varient.base_price',
-                'product.product_name',
-            )
-            ->orderBy('product.product_id', 'desc')
-            ->take(12)
-            ->get();
+    // public function latest_products()
+    // {
+    //     $latest_products = DB::table('product')
+    //         ->join('product_varient', 'product_varient.product_id', '=', 'product.product_id')
+    //         ->select(
+    //             'product.*',
+    //             'product_varient.base_mrp',
+    //             'product_varient.base_price',
+    //             'product_varient.description',
+    //             'product.product_name',
+    //         )
+    //         ->orderBy('product.product_id', 'desc')
+    //         ->take(12)
+    //         ->get();
 
-        return $latest_products;
-    }
+    //     return $latest_products;
+    // }
 
     // product preview 
     public function product_details(Request $request)
@@ -266,7 +267,7 @@ class AllProductController extends Controller
             )
             ->get();
 
-        return view('web.product.cat_product', compact("title","logo","category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone', 'related_prods'));
+        return view('web.product.product_preview', compact("title","logo","category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone', 'related_prods'));
 
     }
 

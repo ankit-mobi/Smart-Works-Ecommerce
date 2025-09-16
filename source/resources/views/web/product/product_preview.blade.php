@@ -181,23 +181,23 @@
             {{-- Product Image Section --}}
             <div class="col-md-6 d-flex justify-content-center align-items-center">
               <div class="product-image-container p-4 border rounded shadow-sm">
-                <img src="{{ asset($product->product_image) }}" class="img-fluid rounded"
-                  alt="{{ $product->product_name }}">
+                <img src="{{ asset($prev_product->product_image) }}" class="img-fluid rounded"
+                  alt="{{ $prev_product->product_name }}">
               </div>
             </div>
             <div class="col-md-6">
               <div class="product-details-container p-4 border rounded shadow-sm">
-                <h1 class="product-name display-5">{{ $product->product_name }}</h1>
-                <p class="product-description lead text-muted mt-3">{{ $product->description }}</p>
+                <h1 class="product-name display-5">{{ $prev_product->product_name }}</h1>
+                <p class="product-description lead text-muted mt-3">{{ $prev_product->description }}</p>
 
                 <div class="product-price-section my-4">
                   {{-- Assuming you have base_price and base_mrp fields --}}
-                  @if($product->base_price < $product->base_mrp)
-                    <span class="product-price h3 text-success me-2">₹{{ number_format($product->base_price, 2) }}</span>
+                  @if($prev_product->base_price < $prev_product->base_mrp)
+                    <span class="product-price h3 text-success me-2">₹{{ number_format($prev_product->base_price, 2) }}</span>
                     <span
-                      class="product-mrp text-muted text-decoration-line-through">₹{{ number_format($product->base_mrp, 2) }}</span>
+                      class="product-mrp text-muted text-decoration-line-through">₹{{ number_format($prev_product->base_mrp, 2) }}</span>
                   @else
-                    <span class="product-price h3">₹{{ number_format($product->base_mrp, 2) }}</span>
+                    <span class="product-price h3">₹{{ number_format($prev_product->base_mrp, 2) }}</span>
                   @endif
                 </div>
 
@@ -212,11 +212,11 @@
 
                   <div class="d-grid gap-2">
                   <button class="btn btn-primary btn-lg w-100 add-to-cart-btn"
-                    data-varient-id="{{ $product->varient_id }}" data-qty="1">
+                    data-varient-id="{{ $prev_product->varient_id }}" data-qty="1">
                     Add to Cart
                   </button>
                   <br><br>
-                  <a href="{{route('checkout',$product->product_id)}}" class="btn btn-success btn-lg w-100">Buy Now</a>
+                  <a href="{{route('checkout',$prev_product->product_id)}}" class="btn btn-success btn-lg w-100">Buy Now</a>
                   
                   </div>
                 
@@ -232,7 +232,7 @@
               <div class="card shadow-sm">
                 <div class="card-body">
                   <h4 class="card-title mb-3">Product Details</h4>
-                  <p class="card-text text-muted">{{ $product->description }}</p>
+                  <p class="card-text text-muted">{{ $prev_product->description }}</p>
                 </div>
               </div>
             </div>

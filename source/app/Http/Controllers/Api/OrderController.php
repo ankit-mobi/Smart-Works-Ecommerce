@@ -760,20 +760,20 @@ else{
   
    public function top_selling(Request $request){
        $current = Carbon::now();
-       $lat = $request->lat;
-       $lng = $request->lng;
-        $cityname = $request->city;
-       $city = ucfirst($cityname);
-       $nearbystore = DB::table('store')
-                    ->select('del_range','store_id',DB::raw("6371 * acos(cos(radians(".$lat . ")) 
-                    * cos(radians(store.lat)) 
-                    * cos(radians(store.lng) - radians(" . $lng . ")) 
-                    + sin(radians(" .$lat. ")) 
-                    * sin(radians(store.lat))) AS distance"))
-                  ->where('store.del_range','>=','distance')
-                  ->orderBy('distance')
-                  ->first();
-if($nearbystore->del_range >= $nearbystore->distance) {               
+      //  $lat = $request->lat;
+      //  $lng = $request->lng;
+      //   $cityname = $request->city;
+      //  $city = ucfirst($cityname);
+      //  $nearbystore = DB::table('store')
+      //               ->select('del_range','store_id',DB::raw("6371 * acos(cos(radians(".$lat . ")) 
+      //               * cos(radians(store.lat)) 
+      //               * cos(radians(store.lng) - radians(" . $lng . ")) 
+      //               + sin(radians(" .$lat. ")) 
+      //               * sin(radians(store.lat))) AS distance"))
+      //             ->where('store.del_range','>=','distance')
+      //             ->orderBy('distance')
+      //             ->first();
+if(true) {        //$nearbystore->del_range >= $nearbystore->distance       
       $topselling = DB::table('store_products')
                  ->join ('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
                   ->join ('product', 'product_varient.product_id', '=', 'product.product_id')
@@ -782,7 +782,7 @@ if($nearbystore->del_range >= $nearbystore->distance) {
                   ->Leftjoin ('deal_product', 'product_varient.varient_id', '=', 'deal_product.varient_id')
                   ->select('store_products.store_id','store_products.stock','product_varient.varient_id','product.product_id','product.product_name', 'product.product_image', 'product_varient.description', 'store_products.price', 'store_products.mrp', 'product_varient.varient_image','product_varient.unit','product_varient.quantity',DB::raw('count(store_orders.varient_id) as count'))
                   ->groupBy('store_products.store_id','store_products.stock','product_varient.varient_id','product.product_id','product.product_name', 'product.product_image', 'product_varient.description', 'store_products.price', 'store_products.mrp', 'product_varient.varient_image','product_varient.unit','product_varient.quantity')
-                  ->where('store_products.store_id', $nearbystore->store_id)
+                  // ->where('store_products.store_id', $nearbystore->store_id)
                   ->where('deal_product.deal_price', NULL)
                   ->where('store_products.price','!=',NULL)
                   ->where('product.hide',0)
@@ -799,10 +799,10 @@ if($nearbystore->del_range >= $nearbystore->distance) {
         	return $message;
         }      
       }
-       else{
-           $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
-            return $message; 
-       }
+      //  else{
+      //      $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
+      //       return $message; 
+      //  }
      
   }    
   
@@ -811,27 +811,27 @@ if($nearbystore->del_range >= $nearbystore->distance) {
   
     public function whatsnew(Request $request){
         $current = Carbon::now(); 
-         $lat = $request->lat;
-       $lng = $request->lng;
-        $cityname = $request->city;
-       $city = ucfirst($cityname);
-       $nearbystore = DB::table('store')
-                    ->select('del_range','store_id',DB::raw("6371 * acos(cos(radians(".$lat . ")) 
-                    * cos(radians(store.lat)) 
-                    * cos(radians(store.lng) - radians(" . $lng . ")) 
-                    + sin(radians(" .$lat. ")) 
-                    * sin(radians(store.lat))) AS distance"))
-                  ->where('store.del_range','>=','distance')
-                  ->orderBy('distance')
-                  ->first();
-       if($nearbystore->del_range >= $nearbystore->distance) {               
+      //    $lat = $request->lat;
+      //  $lng = $request->lng;
+      //   $cityname = $request->city;
+      //  $city = ucfirst($cityname);
+      //  $nearbystore = DB::table('store')
+      //               ->select('del_range','store_id',DB::raw("6371 * acos(cos(radians(".$lat . ")) 
+      //               * cos(radians(store.lat)) 
+      //               * cos(radians(store.lng) - radians(" . $lng . ")) 
+      //               + sin(radians(" .$lat. ")) 
+      //               * sin(radians(store.lat))) AS distance"))
+      //             ->where('store.del_range','>=','distance')
+      //             ->orderBy('distance')
+      //             ->first();
+       if(true) {      //$nearbystore->del_range >= $nearbystore->distance         
       $new = DB::table('store_products')
                  ->join ('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
                   ->join ('product', 'product_varient.product_id', '=', 'product.product_id')
                   ->Leftjoin ('deal_product', 'product_varient.varient_id', '=', 'deal_product.varient_id')
                   ->select('store_products.store_id','store_products.stock','product_varient.varient_id','product.product_id','product.product_name', 'product.product_image', 'product_varient.description', 'store_products.price', 'store_products.mrp', 'product_varient.varient_image','product_varient.unit','product_varient.quantity')
                   ->limit(10)
-                   ->where('store_products.store_id', $nearbystore->store_id)
+                  //  ->where('store_products.store_id', $nearbystore->store_id)
                   ->where('deal_product.deal_price', NULL)
                 ->where('store_products.price','!=',NULL)
                 ->where('product.hide',0)
@@ -847,10 +847,10 @@ if($nearbystore->del_range >= $nearbystore->distance) {
         	return $message;
         }      
     }
-       else{
-           $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
-            return $message; 
-       }
+      //  else{
+      //      $message = array('status'=>'2', 'message'=>'No Products Found Nearby', 'data'=>[]);
+      //       return $message; 
+      //  }
   }    
   
   
