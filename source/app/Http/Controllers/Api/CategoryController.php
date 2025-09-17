@@ -338,7 +338,7 @@ class CategoryController extends Controller
                 ->orderBy('count', 'desc')
                 ->limit(6)
                 ->get();
-            if (count($topsix) > 0) {
+            if (count(value: $topsix) > 0) {
                 $message = array('status' => '1', 'message' => 'Top Six Categories', 'data' => $topsix);
                 return $message;
             } else {

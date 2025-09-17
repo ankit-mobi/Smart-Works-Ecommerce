@@ -20,7 +20,6 @@
 </style>
 
 @section('content')
-  <br><br><br>
 
   {{-- Main container for the product listing page --}}
   <div class="container-fluid py-4">
@@ -93,7 +92,7 @@
           </div>
 
           {{-- Price range filter card --}}
-          <div class="card shadow-sm mb-4">
+          {{-- <div class="card shadow-sm mb-4">
             <div class="card-header">
               <h5 class="mb-0">Price (₹)</h5>
             </div>
@@ -121,7 +120,7 @@
                 </div>
               </form>
             </div>
-          </div>
+          </div> --}}
         </div>
       </div>
 
@@ -176,6 +175,7 @@
 
 
         {{-- Product Details Section --}}
+          @if(isset($prev_product))
         <div class="container my-5">
           <div class="row g-5">
             {{-- Product Image Section --}}
@@ -187,29 +187,21 @@
             </div>
             <div class="col-md-6">
               <div class="product-details-container p-4 border rounded shadow-sm">
-                <h1 class="product-name display-5">{{ $prev_product->product_name }}</h1>
+                 <h1 class="card-title text-truncate">{{ $prev_product->product_name }}</h1>
                 <p class="product-description lead text-muted mt-3">{{ $prev_product->description }}</p>
 
                 <div class="product-price-section my-4">
                   {{-- Assuming you have base_price and base_mrp fields --}}
-                  @if($prev_product->base_price < $prev_product->base_mrp)
-                    <span class="product-price h3 text-success me-2">₹{{ number_format($prev_product->base_price, 2) }}</span>
+                    <span class="product-price h3 text-success me-2">₹{{ number_format($prev_product->price, 2) }}</span>
                     <span
-                      class="product-mrp text-muted text-decoration-line-through">₹{{ number_format($prev_product->base_mrp, 2) }}</span>
-                  @else
-                    <span class="product-price h3">₹{{ number_format($prev_product->base_mrp, 2) }}</span>
-                  @endif
+                      class="product-mrp text-muted text-decoration-line-through">
+                    <del>₹{{ number_format($prev_product->mrp, 2) }}</del>
+                    </span>
+                
                 </div>
 
                 {{-- Add to Cart Form - Placeholder --}}
                 <div class="mt-4">
-
-                  <div class="d-flex align-items-center mb-3">
-                    <label for="quantity" class="me-3 fw-bold">Quantity:</label>
-                    <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control"
-                      style="width: 80px;">
-                  </div>
-
                   <div class="d-grid gap-2">
                   <button class="btn btn-primary btn-lg w-100 add-to-cart-btn"
                     data-varient-id="{{ $prev_product->varient_id }}" data-qty="1">
@@ -225,24 +217,21 @@
               </div>
             </div>
           </div>
+       
+  
           <hr class="my-5">
-          {{-- Product Description and Specifications Section --}}
+
+          @if (isset($varient))
           <div class="row">
             <div class="col-12">
-              <div class="card shadow-sm">
-                <div class="card-body">
-                  <h4 class="card-title mb-3">Product Details</h4>
-                  <p class="card-text text-muted">{{ $prev_product->description }}</p>
-                </div>
-              </div>
+              <h3 class="mb-4">varient s</h3>
             </div>
           </div>
-
-
-          <hr class="my-5">
-
+          @endif
+          
 
           {{-- Related Products Section --}}
+        @if(isset($related_prods) && !$related_prods->isEmpty())
           <div class="row">
             <div class="col-12">
               <h3 class="mb-4">Related Products</h3>
@@ -270,8 +259,69 @@
               </div>
             </div>
           </div>
-
+          @endif
+          
         </div>
+         @else
+        <div class="col-12">
+            <p class="text-center text-muted">No products available.</p>
+        </div>
+           @endif
+
+
+           <div class="container my-5">
+
+        <div class="row g-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card h-100 shadow-sm border-0">
+                        {{-- Product Image --}}
+                        <div class="text-center p-3 bg-light">
+                            <a href="{{route('product_detail', $prev_product->product_id)}}" style="text-decoration: none; color: inherit;">
+                            <img src="{{ asset($prev_product->product_image) }}" alt="{{ $prev_product->product_name }}"
+                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"></a>
+                        </div>
+
+                        {{-- Product Details --}}
+                        <div class="card-body d-flex flex-column">
+                            <a href="{{route('product_detail', $prev_product->product_id)}}" style="text-decoration: none; color:inherit">
+                            <h6 class="card-title text-truncate">{{ $prev_product->product_name }}</h6>
+                            <p class="text-muted small mb-2">{{ Str::limit($prev_product->description, 60) }}</p>
+                        </a>
+
+                            <div class="mt-auto">
+                                {{-- Price & Discount --}}
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-success">₹{{ number_format($prev_product->price) }}</span>
+                                    <span class="text-muted small">
+                                        <del>₹{{ number_format($prev_product->mrp) }}</del>
+                                    </span>
+                                </div>
+                                @php
+                                    $discount = $prev_product->mrp - $prev_product->price;
+                                @endphp
+                                @if($discount > 0)
+                                    <p class="small text-danger mb-2">{{ $discount }} Rs Off</p>
+                                @endif
+                                {{-- Stock / Add Button --}}
+                                <div>
+                                    @if ($prev_product->stock > 0)
+                                        <button class="btn btn-sm btn-outline-success w-100">
+                                            Add <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    @else
+                                        <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div><hr>
+                    </div>
+                </div>
+     
+        </div>
+    </div><br>
+
+
+
 
       </div>
     </div>

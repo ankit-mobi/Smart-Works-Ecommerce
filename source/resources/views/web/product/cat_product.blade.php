@@ -1,7 +1,6 @@
 @extends('web.layout.app')
 
 @section('content')
-  <br><br><br>
 <div class="col-lg-12">
           @if (session()->has('success'))
             <div class="alert alert-success">
@@ -99,7 +98,7 @@
           </div>
 
           {{-- Price range filter card --}}
-          <div class="card shadow-sm mb-4">
+          {{-- <div class="card shadow-sm mb-4">
             <div class="card-header">
               <h5 class="mb-0">Price (₹)</h5>
             </div>
@@ -127,7 +126,7 @@
                 </div>
               </form>
             </div>
-          </div>
+          </div> --}}
         </div>
       </div>
 

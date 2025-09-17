@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use DB;
 use Session;
-
+use Carbon\Carbon;
 use function Laravel\Prompts\select;
+use function PHPSTORM_META\elementType;
 
 class AllProductController extends Controller
 {
@@ -165,60 +166,13 @@ class AllProductController extends Controller
         return view('web.product.cat_product', compact("title","logo","category", "category_sub", "category_child", "products", "prod_variant", 'cust', 'cust_phone'));
     }
 
-    
-    // public function latest_category_three()   //top category it fetchs 6 category
-    // {
-    //     $latest_category = DB::table('categories')
-    //         ->orderBy('cat_id', 'desc')
-    //         ->take(6)
-    //         ->get();
 
-    //     return $latest_category;
-    // }
-
-    // public function deal_products()
-    // {
-    //     $deal_products  = DB::table('deal_product')
-    //         ->join('product_varient', 'deal_product.varient_id', '=', 'product_varient.varient_id')
-    //         ->join('product', 'product_varient.product_id', '=', 'product.product_id')
-    //         ->join('categories', 'product.cat_id', '=', 'categories.cat_id')
-    //         ->select(
-    //             'deal_product.*',
-    //             'product_varient.varient_image',
-    //             'product_varient.base_mrp',
-    //             'product_varient.base_price',
-    //             'product.product_name',
-    //             'product.product_id',
-    //             'categories.title'
-    //         )
-    //         ->orderBy('deal_product.deal_id', 'desc')
-    //         ->get();
-
-    //     return $deal_products;
-    // }
-
-    //Just Arrived Products
-    // public function latest_products()
-    // {
-    //     $latest_products = DB::table('product')
-    //         ->join('product_varient', 'product_varient.product_id', '=', 'product.product_id')
-    //         ->select(
-    //             'product.*',
-    //             'product_varient.base_mrp',
-    //             'product_varient.base_price',
-    //             'product_varient.description',
-    //             'product.product_name',
-    //         )
-    //         ->orderBy('product.product_id', 'desc')
-    //         ->take(12)
-    //         ->get();
-
-    //     return $latest_products;
-    // }
 
     // product preview 
     public function product_details(Request $request)
     {
+      
+
 
         $title = "Home";
         $logo = DB::table('tbl_web_setting')
@@ -242,58 +196,125 @@ class AllProductController extends Controller
 
 
         // product which is selected
-        $product_id = $request->id;
-        $prev_product = DB::table(table: 'product as p')
-            ->join('product_varient as pv', 'pv.product_id', '=', 'p.product_id')
-            ->where('p.product_id', $product_id)
-            ->select(
-                'p.*',
-                'pv.varient_id',
-                'pv.base_mrp',
-                'pv.base_price',
-                'pv.description'
-            )
-            ->first(); // single product info
-
-        // related product to selected product
-        $related_prods = DB::table(table: 'product as p')
-            ->join('product_varient as pv', 'pv.product_id', '=', 'p.product_id')
-            ->where('p.cat_id', $prev_product->cat_id)
-            ->select(
-                'p.*',
-                'pv.base_mrp',
-                'pv.base_price',
-                'pv.description'
-            )
-            ->get();
-
-        return view('web.product.product_preview', compact("title","logo","category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone', 'related_prods'));
-
-    }
+        $prod_id  = $request->id;
+        $today = Carbon::now()->toDateString();
+                //      $lat = $request->lat;
+        //    $lng = $request->lng;
+        // $cityname = $request->city;
+        // $city = ucfirst($cityname);
+        //    $nearbystore = DB::table('store')
+        //                 ->select('del_range','store_id',DB::raw("6371 * acos(cos(radians(".$lat . ")) 
+        //                 * cos(radians(store.lat)) 
+        //                 * cos(radians(store.lng) - radians(" . $lng . ")) 
+        //                 + sin(radians(" .$lat. ")) 
+        //                 * sin(radians(store.lat))) AS distance"))
+        //               ->where('store.del_range','>=','distance')
+        //               ->orderBy('distance')
+        //               ->first();
 
 
-     public function products_siding()
-    {
-        $products_All = DB::table('product as p')
-            ->join('product_varient as pv', 'pv.product_id', '=', 'p.product_id')
-            ->select(
-                'p.*',
-                'pv.varient_id',
-                'pv.base_mrp',
-                'pv.base_price',
-                'pv.varient_image',
-            )         
-            ->take(12)
-            ->get();
-        return $products_All;
-    }
+  if (true) {                 //$nearbystore->del_range >= $nearbystore->distance
+
+             //for product details
+            $prev_product = DB::table('store_products')
+                    ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
+                    ->join('product', 'product_varient.product_id', '=', 'product.product_id')
+                    ->leftJoin('deal_product', function($join) use ($today) {
+                        $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
+                             ->whereDate('deal_product.valid_from', '<=', $today)
+                             ->whereDate('deal_product.valid_to', '>', $today);
+                    })
+                  ->select(
+                    'store_products.store_id',
+                    'store_products.stock',
+                    'product_varient.varient_id',
+                    'product.product_id',
+                    'product.product_name',
+                    'product.product_image',
+                    'product.cat_id',
+                    'product_varient.description',
+                     DB::raw('
+                     CASE 
+                     WHEN deal_product.deal_price IS NOT NULL 
+                     THEN deal_product.deal_price 
+                     ELSE store_products.price 
+                     END as price
+                     '),
+                    'store_products.mrp',
+                    'product_varient.varient_image',
+                    'product_varient.unit',
+                    'product_varient.quantity',
+                   )
+                  ->where('product.product_id',$prod_id )
+                  // ->where('store_products.store_id', $nearbystore->store_id)
+                  ->where('store_products.price','!=',NULL)
+                  ->where('product.hide',0)
+                  ->first();
+
+             //varients of its 
+             $varient = DB::table('store_products')
+                ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
+                ->Leftjoin('deal_product', 'product_varient.varient_id', '=', 'deal_product.varient_id')
+                ->select(
+                    'store_products.store_id',
+                             'store_products.stock',
+                             'product_varient.varient_id',
+                             'product_varient.description',
+                             'store_products.price',
+                             'store_products.mrp',
+                             'product_varient.varient_image', 
+                             'product_varient.unit', 
+                             'product_varient.quantity', 
+                             'deal_product.deal_price',
+                             'deal_product.valid_from',
+                             'deal_product.valid_to')
+                ->where('product_id', $prod_id)
+                ->where('store_products.price', '!=', NULL)
+                // ->where('store_products.store_id',$nearbystore->store_id)
+                ->get();
+
+              // related product to selected product
+              if (!empty($prev_product->cat_id)) {
+                  $related_prods = DB::table('product as p')
+                  ->join('product_varient as pv', 'pv.product_id', '=', 'p.product_id')
+                  ->select(
+                      'p.product_id',
+                        'p.product_name',
+                        'p.product_image',
+                        'p.cat_id',
+                        'pv.varient_id',
+                        'pv.base_mrp',
+                        'pv.base_price',
+                        'pv.description'
+                         )
+                  ->where('p.cat_id', $prev_product->cat_id)
+                  ->where('p.product_id', '!=', $prev_product->product_id) // exclude current product
+                  ->where('p.hide', 0) // only visible products     
+                  ->get();
+                    }
+                    else{
+                        $related_prods = null;
+                    }
+                   
+            // return $related_prods;
+                         return view('web.product.product_preview', compact("title","logo","category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone', 'related_prods'));
+            
+            // else{
+            //    $message = array('status' => '2', 'message' => 'No Products Found Nearby', 'data' => []);
+            // return $message;
+            // }
+           
+
+            }
+            // else {
+        //     $message = array('status' => '2', 'message' => 'No Products Found Nearby', 'data' => []);
+        //     return $message;
+        // }
 
 
-    public function cate_siding()
-    {     
-        $cate_All = DB::table('categories')
-            ->get();
-
-        return $cate_All;
     }
 }
+
+
+   
+

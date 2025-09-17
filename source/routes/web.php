@@ -54,11 +54,6 @@ Route::get('/clear-cache', function () {
 
 Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'], function () {
 
-	//demo testing
-	Route::get('demo', function () {
-		return view('web/demo');
-	});
-
 	
 	//pre
 	Route::get('sign-up', 'RegisterController@register_user')->name('userregister');
@@ -93,9 +88,13 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::get('product/{id}', 'AllProductController@product_details')->name('product_detail');
 	Route::post('search', 'AllProductController@search')->name('search');
 
-	// Route::get('top_selling', 'WebOrderController@top_selling')->name('topSelling'); route not used but controller is used
+	// Route::get('top_selling', 'WebOrderController@top_selling')->name('topSelling'); //route not used but controller is used
+	// only for testing
 	//    Route::get('dealproduct', 'WebCategoryController@dealproduct');
-	Route::get('whatsnew', 'WebOrderController@whatsnew');
+	// Route::get('whatsnew', 'WebOrderController@whatsnew');
+	//    Route::get('topten', 'WebCategoryController@top_ten_cate');
+	
+
 
 
 	// Route for adding a product to the cart
@@ -137,9 +136,6 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 		// Route::post('select_address', 'AddressController@select_address');
 		// Route::post('edit_address', 'AddressController@edit_add');
 		// Route::post('remove_address', 'AddressController@rem_user_address');
-
-
-
 
 		// Address Management
 		Route::get('address', 'AddressController@index')->name('address.index');
