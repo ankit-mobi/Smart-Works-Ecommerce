@@ -254,12 +254,15 @@ class AllProductController extends Controller
              //varients of its 
              $varient = DB::table('store_products')
                 ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
+                ->join('product','product_varient.product_id','=','product.product_id')
                 ->Leftjoin('deal_product', 'product_varient.varient_id', '=', 'deal_product.varient_id')
                 ->select(
                     'store_products.store_id',
                              'store_products.stock',
                              'product_varient.varient_id',
                              'product_varient.description',
+                             'product.product_id',
+                             'product.product_name',
                              'store_products.price',
                              'store_products.mrp',
                              'product_varient.varient_image', 
@@ -268,7 +271,7 @@ class AllProductController extends Controller
                              'deal_product.deal_price',
                              'deal_product.valid_from',
                              'deal_product.valid_to')
-                ->where('product_id', $prod_id)
+                ->where('product.product_id', $prod_id)
                 ->where('store_products.price', '!=', NULL)
                 // ->where('store_products.store_id',$nearbystore->store_id)
                 ->get();
@@ -297,7 +300,7 @@ class AllProductController extends Controller
                     }
                    
             // return $related_prods;
-                         return view('web.product.product_preview', compact("title","logo","category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone', 'related_prods'));
+                         return view('web.product.product_preview', compact("title","logo","category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone', 'related_prods','varient'));
             
             // else{
             //    $message = array('status' => '2', 'message' => 'No Products Found Nearby', 'data' => []);

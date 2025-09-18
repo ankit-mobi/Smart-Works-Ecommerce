@@ -424,6 +424,7 @@ Route::group(['prefix' => '', ['middleware' => ['XSS']], 'namespace' => 'Admin']
 	});
 });
 
+
 Route::group(['prefix' => 'api', 'namespace' => 'Api'], function () {
 	Route::post('forgot_password1/{id}', 'forgotpasswordController@forgot_password1')->name('forgot_password1');
 	Route::get('change_pass/{id}', 'forgotpasswordController@change_pass')->name('change_pass');

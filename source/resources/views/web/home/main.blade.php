@@ -79,7 +79,7 @@
                                 <div>
                                     @if ($topsells->stock > 0)
                                         <button class="btn btn-sm btn-outline-success w-100">
-                                            Add <i class="bi bi-plus-lg"></i>
+                                            Add + <i class="bi bi-plus-lg"></i>
                                         </button>
                                     @else
                                         <span class="badge bg-danger w-100 py-2">Out of Stock</span>
