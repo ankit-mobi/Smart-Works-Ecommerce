@@ -69,7 +69,7 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::post('reset-password', 'ForgotPasswordController@resetPassword')->name('reset_password');
 
 	//Search bar
-	Route::get('search', 'AllProductController@search_web')->name('search.product');
+	Route::get('search', 'WebSearchController@search_web')->name('search.product');
 
 
 
@@ -86,13 +86,15 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::get('products', 'AllProductController@products')->name('products'); //pre
 	Route::get('products/{cat_id}', 'AllProductController@cate')->name('catee'); //pre
 	Route::get('product/{id}/{store_id}', 'AllProductController@product_details')->name('product_detail');
-	Route::post('search', 'AllProductController@search')->name('search');
+	// Route::post('search', 'WebSearchController@search')->name('search');
 
 	Route::get('top_selling', 'WebOrderController@top_selling')->name('topSelling'); //route not used but controller is used
 	// only for testing
 	//    Route::get('dealproduct', 'WebCategoryController@dealproduct');
 	// Route::get('whatsnew', 'WebOrderController@whatsnew');
 	//    Route::get('topten', 'WebCategoryController@top_ten_cate');
+	// Route::get('sidebar','WebHomeController@sidebar');
+
 	
 
 

@@ -1,13 +1,15 @@
 @extends('web.layout.app')
 
+
 @section('content')
 
 
-  @extends('web.layout.sidebar')
-  @section('precontent')
+<div class="container-fluid py-4">
+  <div class="row">
+  @include('web.layout.sidebar')
+ 
 
-
-
+ <div class="col-sm-9">
    {{-- Else: Show default product listing --}}
     @if(isset($products) && count($products) > 0)
     <div class="container-fluid my-5">     
@@ -19,8 +21,9 @@
                                         <div class="text-center p-3 bg-light">
                                              <a href="{{route('product_detail', ['id' =>$deal->product_id, 'store_id' => $deal->store_id])}}" style="text-decoration: none; color: inherit;">
                                             <img src="{{ asset($deal->product_image) }}" alt="{{ $deal->product_name }}"
-                                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"> </a>
-                                        </div>
+                                                class="img-fluid rounded" style="max-height: 220px; min-height: 100px; object-fit: contain;"> </a>
+                                        </div> 
+
 
                                         {{-- Product Details --}}
                                         <div class="card-body d-flex flex-column">
@@ -33,23 +36,23 @@
                                                 <span class="text-muted small">
                                                     <del>₹{{ number_format($deal->mrp) }}</del>
                                                 </span>
-                                            </div>
+                                            </div> 
 
-                                            @php
-                                                $discount = $deal->mrp - $deal->price;
+                                             @php
+                                                {{$discount = $deal->mrp - $deal->price;}}
                                             @endphp
                                             @if($discount > 0)
                                                 <p class="small text-danger mb-2">{{ number_format($discount) }} Rs Off</p>
                                             @endif
 
                                             {{-- Countdown Timer --}}
-                                            <div class="d-flex align-items-center text-warning small mb-2">
-                                                <i class="fa-solid fa-stopwatch me-1"></i>
+                                         <div class="d-flex align-items-center text-warning small mb-2">
+                                                <i class="fa-solid fa-stopwatch me-1"></i> --}}
                                                 {{-- <span class="countdown-timer"
                                                     data-endtime="{{ \Carbon\Carbon::parse($deal->valid_to)->timestamp }}">
                                                     Loading...
                                                 </span> --}}
-                                            </div>
+                                       </div>
 
                                             {{-- Stock / Add Button --}}
                                             <div class="mt-auto">
@@ -67,10 +70,11 @@
                             @endforeach
                         </div>                     
     </div>
-    @endif
+    @endif  
+
+      </div> {{-- end col-sm-9 --}}
+  </div> {{-- end row --}}
+</div> {{-- end container --}}
 
 
-
-
-  @endsection
   @endsection

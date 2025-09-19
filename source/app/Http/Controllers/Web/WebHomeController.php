@@ -51,34 +51,6 @@ class WebHomeController extends Controller
     }
 
 
-    public function sidebar(){
-         $title = "Home";
-        $logo = DB::table('tbl_web_setting')
-                ->where('set_id', '1')
-                ->first();	
-        $cust_phone = Session::get('bamaCust');
-        $cust = DB::table('users')
-            ->where('user_phone', $cust_phone)
-            ->first();
-       
-            // for side section
-        $category = DB::table('categories')
-            ->get();
-        $category_sub = DB::table('categories')
-            ->where('level', 1)
-            ->get();
-        $category_child = DB::table('categories')
-            ->where('level', 2)
-            ->get();
-
-           
-
-
-        return view('web.layout.sidebar', compact("title","logo", 'cust_phone', 'cust', "category", "category_sub", "category_child"));
-
-
-    }
-
     public function aboutus(Request $request)
     {
         $title = "About Us";

@@ -1,19 +1,24 @@
 @extends('web.layout.app')
 
+
 @section('content')
 
 
-  @extends('web.layout.sidebar')
-  @section('precontent')
+<div class="container-fluid py-4">
+  <div class="row">
+  @include('web.layout.sidebar')
+ 
+
+ <div class="col-sm-9">
 
 
    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {{-- If search results exist --}}
-    @if(isset($Sprods) && count($Sprods) > 0)
-        @foreach($Sprods as $Sprod)
+    @if(isset($prod) && count($prod) > 0)
+        @foreach($prod as $Sprod)
             <div class="col mb-4">
                 <div class="card h-100 product-card shadow-sm">
-                    <a href="{{ route('product_detail', ['id' => $Sprod->product_id, 'store_id' => $produt]) }}"
+                    <a href="{{ route('product_detail', ['id' => $Sprod->product_id, 'store_id' => $Sprod->varients[0]->store_id]) }}"
                        class="text-decoration-none text-dark">
                         @if(isset($Sprod->varients[0]))
                             <img src="{{ asset($Sprod->varients[0]->varient_image) }}" 
@@ -68,13 +73,10 @@
                     </a>
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title product-name">{{ $product->product_name }}</h6>
-                        @foreach($prod_variant as $variant)
-                            @if($variant->product_id == $product->product_id)
-                                <p class="card-text text-muted small mb-1">{{ $variant->description }}</p>
-                                <h5 class="product-price font-weight-bold">₹{{ $variant->base_price }}</h5>
-                                @break
-                            @endif
-                        @endforeach
+                        
+                                <p class="card-text text-muted small mb-1">{{ $product->description }}</p>
+                                <h5 class="product-price font-weight-bold">₹{{ $product->price }}</h5>
+                         
                     </div>
                     <div class="card-footer bg-white border-0 pt-0">
                         <div class="d-flex justify-content-between align-items-center">
@@ -84,13 +86,13 @@
                                 <button type="button" class="btn btn-outline-secondary">1</button>
                                 <button type="button" class="btn btn-outline-secondary"><i class="fas fa-plus"></i></button>
                             </div>
-                            @if(isset($variant))
+                            {{-- @if(isset($variant))
                                 <button class="btn add-to-cart-btn" 
                                         data-varient-id="{{ $variant->varient_id }}" 
                                         data-qty="1">
                                     Add to Cart
                                 </button>
-                            @endif
+                            @endif --}}
                         </div>
                     </div>
                 </div>
@@ -108,6 +110,10 @@
 </div>
 
 
+
+  </div> {{-- end col-sm-9 --}}
+  </div> {{-- end row --}}
+</div> {{-- end container --}}
 
 
 
@@ -129,4 +135,3 @@
 </style>
 @endsection
 
-@endsection
