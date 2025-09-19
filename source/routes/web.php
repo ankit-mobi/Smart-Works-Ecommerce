@@ -78,17 +78,17 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 
 	// Home & Pages Access without login
 	Route::get('/', 'WebHomeController@web')->name('webhome'); //pre        //done
-	Route::get('about', 'WebHomeController@aboutus')->name('webabout');   //pre  //done
+	Route::get('about', 'WebHomeController@aboutus')->name('webabout');   //pre  //doneF
 	Route::get('terms', 'WebHomeController@terms')->name('terms');  //pre   //done
 	Route::get('contact', 'WebHomeController@contact')->name('contact');
 
 	// Products
 	Route::get('products', 'AllProductController@products')->name('products'); //pre
 	Route::get('products/{cat_id}', 'AllProductController@cate')->name('catee'); //pre
-	Route::get('product/{id}', 'AllProductController@product_details')->name('product_detail');
+	Route::get('product/{id}/{store_id}', 'AllProductController@product_details')->name('product_detail');
 	Route::post('search', 'AllProductController@search')->name('search');
 
-	// Route::get('top_selling', 'WebOrderController@top_selling')->name('topSelling'); //route not used but controller is used
+	Route::get('top_selling', 'WebOrderController@top_selling')->name('topSelling'); //route not used but controller is used
 	// only for testing
 	//    Route::get('dealproduct', 'WebCategoryController@dealproduct');
 	// Route::get('whatsnew', 'WebOrderController@whatsnew');

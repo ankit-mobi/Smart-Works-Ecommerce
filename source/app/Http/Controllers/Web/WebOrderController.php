@@ -41,7 +41,7 @@ if(true) {     //$nearbystore->del_range >= $nearbystore->distance
                   ->where('store_products.price','!=',NULL)
                   ->where('product.hide',0)
                   ->orderBy('count','desc')
-                  ->limit(10)
+                  // ->limit(10)
                   ->get();
                   
          if(count($topselling)>0){
@@ -52,7 +52,7 @@ if(true) {     //$nearbystore->del_range >= $nearbystore->distance
         else{
         	// $message = array('status'=>'0', 'message'=>'nothing in top', 'data'=>[]);
         	// return $message;
-            return $topselling;
+            return $topselling='';
         }      
       }
     //    else{
@@ -96,8 +96,7 @@ if(true) {     //$nearbystore->del_range >= $nearbystore->distance
         	return $new;
         }
         else{
-        	$message = array('status'=>'0', 'message'=>'nothing in new', 'data'=>[]);
-        	return $message;
+        	return $new=null;
         }      
     }
       //  else{

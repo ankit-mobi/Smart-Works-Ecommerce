@@ -9,7 +9,7 @@
   @extends('web.layout.sidebar')
   @section('precontent')
 
-  @if(isset($prev_product))
+  @if(isset($prev_product) && !$related_prods->isEmpty())
             <div class="container my-5">
               <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
 
@@ -101,14 +101,14 @@
                     <div class="card h-100 shadow-sm border-0">
                         {{-- Product Image --}}
                         <div class="text-center p-3 bg-light">
-                            <a href="{{route('product_detail', $prod_vats->product_id)}}" style="text-decoration: none; color: inherit;">
+                            <a href="{{route('product_detail', ['id' => $prod_vats->product_id,'store_id' => $prod_vats->store_id])}}" style="text-decoration: none; color: inherit;">
                             <img src="{{ asset($prod_vats->varient_image) }}" alt="{{ $prod_vats->product_name }}"
                                 class="img-fluid rounded" style="max-height: 100px; object-fit: contain;"></a>
                         </div>
 
                         {{-- Product Details --}}
                         <div class="card-body d-flex flex-column">
-                            <a href="{{route('product_detail', $prod_vats->product_id)}}" style="text-decoration: none; color:inherit">
+                            <a href="{{route('product_detail', ['id' => $prod_vats->product_id,'store_id' => $prod_vats->store_id])}}" style="text-decoration: none; color:inherit">
                             <h6 class="card-title text-truncate">{{ $prod_vats->product_name }}</h6>
                             <p class="text-muted small mb-2">{{ Str::limit($prod_vats->description, 60) }}</p>
                         </a>
@@ -145,18 +145,13 @@
         </div>
     </div>
     @endif
-    <br>
+    
 
 
 
-
-            
 
 
             {{-- Related Products Section --}}
-          
-
-
             @if(isset($related_prods) && !$related_prods->isEmpty())
             <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -169,15 +164,15 @@
                 <div class="col-md-3 col-sm-6">
                     <div class="card h-100 shadow-sm border-0">
                         {{-- Product Image --}}
-                        <div class="text-center p-3 bg-light">
-                            <a href="{{route('product_detail', $related_prod->product_id)}}" style="text-decoration: none; color: inherit;">
+                        <div class="text-center p-3 bg-light">             
+                            <a href="{{route('product_detail', ['id'=>$related_prod->product_id,'store_id' => $related_prod->store_id])}}" style="text-decoration: none; color: inherit;">
                             <img src="{{ asset($related_prod->product_image) }}" alt="{{ $related_prod->product_name }}"
                                 class="img-fluid rounded" style="max-height: 100px; object-fit: contain;"></a>
                         </div>
 
                         {{-- Product Details --}}
                         <div class="card-body d-flex flex-column">
-                            <a href="{{route('product_detail', $related_prod->product_id)}}" style="text-decoration: none; color:inherit">
+                            <a href="{{route('product_detail', ['id'=>$related_prod->product_id,'store_id' => $related_prod->store_id])}}" style="text-decoration: none; color:inherit">
                             <h6 class="card-title text-truncate">{{ $related_prod->product_name }}</h6>
                             <p class="text-muted small mb-2">{{ Str::limit($related_prod->description, 60) }}</p>
                         </a>
@@ -185,26 +180,26 @@
                             <div class="mt-auto">
                                 {{-- Price & Discount --}}
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold text-success">₹{{ number_format($related_prod->base_price) }}</span>
+                                    <span class="fw-bold text-success">₹{{ number_format($related_prod->price) }}</span>
                                     <span class="text-muted small">
-                                        <del>₹{{ number_format($related_prod->base_mrp) }}</del>
+                                        <del>₹{{ number_format($related_prod->mrp) }}</del>
                                     </span>
                                 </div>
                                 @php
-                                    $discount = $related_prod->base_mrp - $related_prod->base_price;
+                                    $discount = $related_prod->mrp - $related_prod->price;
                                 @endphp
                                 @if($discount > 0)
                                     <p class="small text-danger mb-2">{{ $discount }} Rs Off</p>
                                 @endif
                                 {{-- Stock / Add Button --}}
                                 <div>
-                                    {{-- @if ($related_prod->stock > 0)
+                                    @if ($related_prod->stock > 0)
                                         <button class="btn btn-sm btn-outline-success w-100">
                                             Add + <i class="bi bi-plus-lg"></i>
                                         </button>
                                     @else
                                         <span class="badge bg-danger w-100 py-2">Out of Stock</span>
-                                    @endif --}}
+                                    @endif
                                 </div>
                             </div>
                         </div><hr>

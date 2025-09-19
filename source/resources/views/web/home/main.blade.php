@@ -49,14 +49,14 @@
                     <div class="card h-100 shadow-sm border-0">
                         {{-- Product Image --}}
                         <div class="text-center p-3 bg-light">
-                            <a href="{{route('product_detail', $topsells->product_id)}}" style="text-decoration: none; color: inherit;">
+                            <a href="{{route('product_detail', ['id' =>$topsells->product_id, 'store_id' => $topsells->store_id])}}" style="text-decoration: none; color: inherit;">
                             <img src="{{ asset($topsells->product_image) }}" alt="{{ $topsells->product_name }}"
                                 class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"></a>
                         </div>
 
                         {{-- Product Details --}}
                         <div class="card-body d-flex flex-column">
-                            <a href="{{route('product_detail', $topsells->product_id)}}" style="text-decoration: none; color:inherit">
+                            <a href="{{route('product_detail', ['id' =>$topsells->product_id, 'store_id' => $topsells->store_id])}}" style="text-decoration: none; color:inherit">
                             <h6 class="card-title text-truncate">{{ $topsells->product_name }}</h6>
                             <p class="text-muted small mb-2">{{ Str::limit($topsells->description, 60) }}</p>
                         </a>
@@ -95,6 +95,7 @@
 
 
     {{-- Deals of the Day --}}
+    @if(isset($deal_products) && !$deal_products->isEmpty())
     <div class="container-fluid my-5">
         <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
             <h3 class="text-uppercase">Deals of the Day</h3>
@@ -111,14 +112,16 @@
                                     <div class="card h-100 shadow-sm border-0">
                                         {{-- Image --}}
                                         <div class="text-center p-3 bg-light">
+                                             <a href="{{route('product_detail', ['id' =>$deal->product_id, 'store_id' => $deal->store_id])}}" style="text-decoration: none; color: inherit;">
                                             <img src="{{ asset($deal->product_image) }}" alt="{{ $deal->product_name }}"
-                                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;">
+                                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"> </a>
                                         </div>
 
                                         {{-- Product Details --}}
                                         <div class="card-body d-flex flex-column">
+                                               <a href="{{route('product_detail', ['id' =>$deal->product_id, 'store_id' => $deal->store_id])}}" style="text-decoration: none; color: inherit;">
                                             <h6 class="card-title text-truncate">{{ $deal->product_name }}</h6>
-                                            <p class="text-muted small mb-2">{{ Str::limit($deal->description, 60) }}</p>
+                                            <p class="text-muted small mb-2">{{ Str::limit($deal->description, 60) }}</p></a>
 
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <span class="fw-bold text-success">₹{{ number_format($deal->price) }}</span>
@@ -172,7 +175,9 @@
                 </button>
             </div>
         </div>
-    </div><br>
+    </div>
+    @endif
+    <br>
 
     {{-- banner secondary_banner--}}
     <div id="exploreCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -198,40 +203,43 @@
     <br><br>
 
     {{-- Just Arrived Products --}}
+    @if(isset($whatsnew) && !$whatsnew->isEmpty())
     <div class="container-fluid my-5">
         <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
             <h3 class="text-uppercase">Just Arrived Products</h3>
             <a href="" class="btn btn-outline-primary btn-sm">View All</a>
         </div>
 
-        <div id="dealsCarousel" class="carousel slide" data-bs-ride="false">
+        <div id="arrivedCarousel" class="carousel slide" data-bs-ride="false">
             <div class="carousel-inner">
-                @foreach($whatsnew->chunk(4) as $chunkIndex => $dealChunk)
+                @foreach($whatsnew->chunk(4) as $chunkIndex => $new_prods)
                     <div class="carousel-item {{ $chunkIndex == 0 ? 'active' : '' }}">
                         <div class="row g-4 mx-5">
-                            @foreach($dealChunk as $deal)
+                            @foreach($new_prods as $new_prod)
                                 <div class="col-md-3 col-sm-6">
                                     <div class="card h-100 shadow-sm border-0">
                                         {{-- Image --}}
                                         <div class="text-center p-3 bg-light">
-                                            <img src="{{ asset($deal->product_image) }}" alt="{{ $deal->product_name }}"
-                                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;">
+                                            <a href="{{route('product_detail', ['id' =>$new_prod->product_id, 'store_id' => $new_prod->store_id])}}" style="text-decoration: none; color: inherit;">
+                                            <img src="{{ asset($new_prod->product_image) }}" alt="{{ $new_prod->product_name }}"
+                                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"></a>
                                         </div>
 
                                         {{-- Product Details --}}
                                         <div class="card-body d-flex flex-column">
-                                            <h6 class="card-title text-truncate">{{ $deal->product_name }}</h6>
-                                            <p class="text-muted small mb-2">{{ Str::limit($deal->description, 60) }}</p>
+                                            <a href="{{route('product_detail', ['id' =>$new_prod->product_id, 'store_id' => $new_prod->store_id])}}" style="text-decoration: none; color: inherit;">
+                                            <h6 class="card-title text-truncate">{{ $new_prod->product_name }}</h6>
+                                            <p class="text-muted small mb-2">{{ Str::limit($new_prod->description, 60) }}</p></a>
 
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold text-success">₹{{ number_format($deal->price) }}</span>
+                                                <span class="fw-bold text-success">₹{{ number_format($new_prod->price) }}</span>
                                                 <span class="text-muted small">
-                                                    <del>₹{{ number_format($deal->mrp) }}</del>
+                                                    <del>₹{{ number_format($new_prod->mrp) }}</del>
                                                 </span>
                                             </div>
 
                                             @php
-                                                $discount = $deal->mrp - $deal->price;
+                                                $discount = $new_prod->mrp - $new_prod->price;
                                             @endphp
                                             @if($discount > 0)
                                                 <p class="small text-danger mb-2">{{ number_format($discount) }} Rs Off</p>
@@ -241,7 +249,7 @@
 
                                             {{-- Stock / Add Button --}}
                                             <div class="mt-auto">
-                                                @if ($deal->stock > 0)
+                                                @if ($new_prod->stock > 0)
                                                     <button class="btn btn-sm btn-outline-success w-100">
                                                         Add <i class="bi bi-plus-lg"></i>
                                                     </button>
@@ -260,19 +268,21 @@
 
             {{-- Custom Small Carousel Controls --}}
             <div class="carousel-controls-container">
-                <button class="carousel-control-prev" type="button" data-bs-target="#dealsCarousel" data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target="#arrivedCarousel" data-bs-slide="prev">
                     <span class="custom-control-icon">&lt;</span>
                 </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#dealsCarousel" data-bs-slide="next">
+                <button class="carousel-control-next" type="button" data-bs-target="#arrivedCarousel" data-bs-slide="next">
                     <span class="custom-control-icon">&gt;</span>
                 </button>
             </div>
         </div>
     </div>
+    @endif
 
 
 
     {{-- Top Categories --}}
+    @if(isset($top_ten_cate) && !$top_ten_cate->isEmpty())
     <div class="container-fluid my-5">
     <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
             <h3 >Top Categories</h3>
@@ -291,6 +301,7 @@
         @endforeach
     </div>
     </div>
+    @endif
 
 
 
@@ -326,6 +337,26 @@
             font-size: 1.5rem;
             color: #333;
             line-height: 1;
+        }
+
+        /* just arrived */
+        #arrivedCarousel .carousel-control-prev,
+        #arrivedCarousel .carousel-control-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            /* Keep them always visible */
+            transition: all 0.2s ease-in-out;
+        }
+        #arrivedCarousel .carousel-control-prev:hover,
+        #arrivedCarousel .carousel-control-next:hover {
+            background-color: #9b9696;
         }
 
          /* category-card */

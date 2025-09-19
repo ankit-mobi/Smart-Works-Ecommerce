@@ -61,8 +61,7 @@ class WebCategoryController extends Controller
                 return $deal_p;
                 
             } else {
-                $message = array('status' => '0', 'message' => 'Products not found', 'data' => []);
-                return $message;
+                return $deal_p=null;
             }
          }
         // else {
@@ -107,8 +106,9 @@ class WebCategoryController extends Controller
                 // return $message;
                 return $toptencate;
             } else {
-                $message = array('status' => '0', 'message' => 'Nothing in Top Six', 'data' => []);
-                return $message;
+                // $message = array('status' => '0', 'message' => 'Nothing in Top Six', 'data' => []);
+                // return $message;
+                return $toptencate=null;
             }
         }
         //  else {

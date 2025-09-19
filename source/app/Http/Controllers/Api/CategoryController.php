@@ -228,6 +228,7 @@ class CategoryController extends Controller
                              'deal_product.valid_to')
                 ->where('product_id', $prod_id)
                 ->where('store_products.price', '!=', NULL)
+                // ->where('store_products.store_id', '!=', $prod_id->store_id) //exclude same store
                 // ->where('store_products.store_id',$nearbystore->store_id)
                 ->get();
             if (count($varient) > 0) {

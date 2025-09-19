@@ -26,20 +26,20 @@ class WebSearchController extends Controller
     //               ->first();
     if(true) 
          { //$nearbystore->del_range >= $nearbystore->distance
-        $prod = DB::table('store_products')
+        $Sprods = DB::table('store_products')
                  ->join ('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
 			     ->join ('product', 'product_varient.product_id', '=', 'product.product_id')
-			     ->select('product.product_name','product.product_id')
+			     ->select('store_products.store_id','product.product_name','product.product_id')
                  ->groupBy('product.product_name','product.product_id')
                 //  ->where('store_products.store_id', $nearbystore->store_id)
                 ->where('product.product_name', 'like', '%'.$keyword.'%')
                 ->get();
 
-        if(count($prod)>0){
+        if(count($Sprods)>0){
             $result =array();
             $i = 0;
 
-            foreach ($prod as $prods) {
+            foreach ($Sprods as $prods) {
                 array_push($result, $prods);
 
                 $app = json_decode($prods->product_id);
@@ -56,7 +56,7 @@ class WebSearchController extends Controller
              
             }
 
-            $message = array('status'=>'1', 'message'=>'Products found', 'data'=>$prod);
+            $message = array('status'=>'1', 'message'=>'Products found', 'data'=>$Sprods);
             return $message;
         }
         else{
