@@ -47,7 +47,7 @@
 
                                             {{-- Countdown Timer --}}
                                          <div class="d-flex align-items-center text-warning small mb-2">
-                                                <i class="fa-solid fa-stopwatch me-1"></i> --}}
+                                                <i class="fa-solid fa-stopwatch me-1"></i> 
                                                 {{-- <span class="countdown-timer"
                                                     data-endtime="{{ \Carbon\Carbon::parse($deal->valid_to)->timestamp }}">
                                                     Loading...

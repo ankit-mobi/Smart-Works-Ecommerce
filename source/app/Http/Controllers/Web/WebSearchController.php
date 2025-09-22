@@ -84,14 +84,14 @@ class WebSearchController extends Controller
                     $prod[$i]->varients = $variants;
                 }
 
-                return view('web.product.cat_product', compact("title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone', 'prod'));
+                return view('web.product.our_product', compact("title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone', 'prod'));
                 
             } else {
-                return view('web.product.cat_product', compact("title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone'))->withErrors('No Products Found');
+                return view('web.product.our_product', compact("title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone'))->withErrors('No Products Found');
             }
         }
         //    else{
-        // return view('web.product.cat_product', compact("title", "logo", "category", "category_sub", "category_child",'cust', 'cust_phone'))->withErrors('No Products Found Nearby');
+        // return view('web.product.our_product', compact("title", "logo", "category", "category_sub", "category_child",'cust', 'cust_phone'))->withErrors('No Products Found Nearby');
         //    }
     }
 }

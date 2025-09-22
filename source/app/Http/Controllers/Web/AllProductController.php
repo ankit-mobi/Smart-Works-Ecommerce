@@ -23,7 +23,6 @@ class AllProductController extends Controller
         $logo = DB::table('tbl_web_setting')
             ->where('set_id', '1')
             ->first();
-
         $cust_phone = Session::get('bamaCust');
         $cust = DB::table('users')
             ->where('user_phone', $cust_phone)
@@ -36,8 +35,6 @@ class AllProductController extends Controller
             ->get();
         $category_child = DB::table('categories')
             ->where('level', 2)
-            ->get();
-        $prod_variant =  DB::table('product_varient')
             ->get();
 
 
@@ -65,12 +62,12 @@ class AllProductController extends Controller
             $products = DB::table('store_products')
                 ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
                 ->join('product', 'product_varient.product_id', '=', 'product.product_id')
-                 ->leftJoin('deal_product', function ($join) {
-                            $d = now();
-                            $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
-                                ->where('deal_product.valid_from', '<=', $d)
-                                ->where('deal_product.valid_to', '>', $d);
-                        })
+                ->leftJoin('deal_product', function ($join) {
+                    $d = now();
+                    $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
+                        ->where('deal_product.valid_from', '<=', $d)
+                        ->where('deal_product.valid_to', '>', $d);
+                })
                 ->select(
                     'store_products.store_id',
                     'store_products.stock',
@@ -84,7 +81,7 @@ class AllProductController extends Controller
                     'product_varient.varient_image',
                     'product_varient.unit',
                     'product_varient.quantity',
-                     DB::raw('COALESCE(deal_product.deal_price, store_products.price) as price') //  Deal price if active, else normal price
+                    DB::raw('COALESCE(deal_product.deal_price, store_products.price) as price') //  Deal price if active, else normal price
                 )
                 // ->where('store_products.store_id', $nearbystore->store_id)
                 ->where('store_products.price', '!=', NULL)
@@ -93,11 +90,14 @@ class AllProductController extends Controller
                 ->get();
 
 
-            return view('web.product.cat_product', compact("title", "logo", "category", "category_sub", "category_child", "products", "prod_variant", 'cust', 'cust_phone'));
+            return view('web.product.our_product', compact("title", "logo", "category", "category_sub", "category_child", "products", 'cust', 'cust_phone'));
         }
+        // else{
+        //        return view('web.product.our_product', compact("title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone'))->withErrors('No Products Found NearBy');
+        // }
     }
 
-    // side categories
+    // side categories products
     public function cate(Request $request)
     {
 
@@ -123,8 +123,6 @@ class AllProductController extends Controller
 
 
 
-
-
         //    $lat = $request->lat;
         //    $lng = $request->lng;
         // $cityname = $request->city;
@@ -139,100 +137,88 @@ class AllProductController extends Controller
         //               ->orderBy('distance')
         //               ->first();
         if (true) {              //$nearbystore->del_range >= $nearbystore->distance
-           $products = DB::table('store_products')
-    ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
-    ->join('product', 'product_varient.product_id', '=', 'product.product_id')
-    ->leftJoin('deal_product', function ($join) {
-        $d = now(); // current timestamp
-        $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
-             ->where('deal_product.valid_from', '<=', $d)
-             ->where('deal_product.valid_to', '>', $d);
-    })
-    ->where('product.cat_id', $cat_id)
-    // ->where('store_products.store_id', $nearbystore->store_id)
-    ->whereNotNull('store_products.price')
-    ->where('product.hide', 0)
-    ->select(
-        'store_products.store_id',
-        'store_products.stock',
-        'product_varient.varient_id',
-        'product.product_id',
-        'product.product_name',
-        'product.product_image',
-        'product_varient.description',
-        'store_products.mrp',
-        'product_varient.varient_image',
-        'product_varient.unit',
-        'product_varient.quantity',
-        DB::raw('COALESCE(deal_product.deal_price, store_products.price) as price') // ✅ Deal or fallback
-    )
-    ->get();
+            $products = DB::table('store_products')
+                ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
+                ->join('product', 'product_varient.product_id', '=', 'product.product_id')
+                ->leftJoin('deal_product', function ($join) {
+                    $d = now(); // current timestamp
+                    $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
+                        ->where('deal_product.valid_from', '<=', $d)
+                        ->where('deal_product.valid_to', '>', $d);
+                })
+                ->where('product.cat_id', $cat_id)
+                // ->where('store_products.store_id', $nearbystore->store_id)
+                ->whereNotNull('store_products.price')
+                ->where('product.hide', 0)
+                ->select(
+                    'store_products.store_id',
+                    'store_products.stock',
+                    'product_varient.varient_id',
+                    'product.product_id',
+                    'product.product_name',
+                    'product.product_image',
+                    'product_varient.description',
+                    'store_products.mrp',
+                    'product_varient.varient_image',
+                    'product_varient.unit',
+                    'product_varient.quantity',
+                    DB::raw('COALESCE(deal_product.deal_price, store_products.price) as price') // Deal or fallback
+                )
+                ->get();
 
-if (count($products) > 0) {
-    $result = [];
-    $i = 0;
+            if (count($products) > 0) {
+                $result = [];
+                $i = 0;
 
-    foreach ($products as $prods) {
-        array_push($result, $prods);
+                foreach ($products as $prods) {
+                    array_push($result, $prods);
 
-        $app = json_decode($prods->product_id);
-        $apps = [$app];
+                    $app = json_decode($prods->product_id);
+                    $apps = [$app];
 
-        $app = DB::table('store_products')
-            ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
-            ->leftJoin('deal_product', function ($join) {
-                $d = now();
-                $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
-                     ->where('deal_product.valid_from', '<=', $d)
-                     ->where('deal_product.valid_to', '>', $d);
-            })
-            ->select(
-                'store_products.store_id',
-                'store_products.stock',
-                'product_varient.varient_id',
-                'product_varient.description',
-                'store_products.mrp',
-                'product_varient.varient_image',
-                'product_varient.unit',
-                'product_varient.quantity',
-                DB::raw('COALESCE(deal_product.deal_price, store_products.price) as price') // ✅ Deal or fallback
-            )
-            // ->where('store_products.store_id', $nearbystore->store_id)
-            ->whereIn('product_varient.product_id', $apps)
-            ->whereNotNull('store_products.price')
-            ->get();
+                    $app = DB::table('store_products')
+                        ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
+                        ->leftJoin('deal_product', function ($join) {
+                            $d = now();
+                            $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
+                                ->where('deal_product.valid_from', '<=', $d)
+                                ->where('deal_product.valid_to', '>', $d);
+                        })
+                        ->select(
+                            'store_products.store_id',
+                            'store_products.stock',
+                            'product_varient.varient_id',
+                            'product_varient.description',
+                            'store_products.mrp',
+                            'product_varient.varient_image',
+                            'product_varient.unit',
+                            'product_varient.quantity',
+                            DB::raw('COALESCE(deal_product.deal_price, store_products.price) as price') //  Deal or fallback
+                        )
+                        // ->where('store_products.store_id', $nearbystore->store_id)
+                        ->whereIn('product_varient.product_id', $apps)
+                        ->whereNotNull('store_products.price')
+                        ->get();
 
-        $result[$i]->varients = $app;
-        $i++;
-    }
+                    $result[$i]->varients = $app;
+                    $i++;
+                }
 
 
-                // $message = array('status' => '1', 'message' => 'Products found', 'data' => $prod);
-                // return $message;
-                 return view('web.demo', compact("products",  "title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone')); //"prod_variant", 'web.product.cat_product'  "title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone'
-             } 
-             //else {
-            //     $message = array('status' => '0', 'message' => 'Products not found', 'data' => []);
-            //     return $message;
-            // }
+                
+                return view('web.product.our_product', compact("products",  "title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone')); 
+            }
+            else {
+                return view('web.product.our_product', compact(  "title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone'))->withErrors("No Products Found Try other");  
+
+            }
         }
         //  else {
-        //     $message = array('status' => '2', 'message' => 'No Products Found Nearby', 'data' => []);
-        //     return $message;
+        //   return view('web.product.our_product', compact(  "title", "logo", "category", "category_sub", "category_child", 'cust', 'cust_phone'))->withErrors("No Products Found ");  
         // }
 
+    }
 
-
-
-        // $products =  DB::table('product')
-        //     ->where('cat_id', $cat_id)
-        //     ->get();
-        // $prod_variant =  DB::table('product_varient')
-        //     ->get();
-      
-        // return view('web.product.cat_product', compact("title", "logo", "category", "category_sub", "category_child", "products",'cust', 'cust_phone')); //"prod_variant",
-    } 
-     
 
     // product preview 
     public function product_details(Request $request)
@@ -286,11 +272,11 @@ if (count($products) > 0) {
                     ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
                     ->join('product', 'product_varient.product_id', '=', 'product.product_id')
                     ->leftJoin('deal_product', function ($join) {
-                            $d = now();
-                            $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
-                                ->where('deal_product.valid_from', '<=', $d)
-                                ->where('deal_product.valid_to', '>', $d);
-                        })
+                        $d = now();
+                        $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
+                            ->where('deal_product.valid_from', '<=', $d)
+                            ->where('deal_product.valid_to', '>', $d);
+                    })
                     ->select(
                         'store_products.store_id',
                         'store_products.stock',
@@ -318,11 +304,11 @@ if (count($products) > 0) {
                     ->join('product_varient', 'store_products.varient_id', '=', 'product_varient.varient_id')
                     ->join('product', 'product_varient.product_id', '=', 'product.product_id')
                     ->leftJoin('deal_product', function ($join) {
-                            $d = now();
-                            $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
-                                ->where('deal_product.valid_from', '<=', $d)
-                                ->where('deal_product.valid_to', '>', $d);
-                        })                    ->select(
+                        $d = now();
+                        $join->on('product_varient.varient_id', '=', 'deal_product.varient_id')
+                            ->where('deal_product.valid_from', '<=', $d)
+                            ->where('deal_product.valid_to', '>', $d);
+                    })->select(
                         'store_products.store_id',
                         'store_products.stock',
                         'product_varient.varient_id',
@@ -341,19 +327,19 @@ if (count($products) > 0) {
                     // ->where('store_products.store_id',$nearbystore->store_id)
                     ->where('store_products.store_id', '!=', $store_id) //exclude same store
                     ->get();
- 
+
 
                 // related product to selected product
                 if (!empty($prev_product->cat_id)) { //
                     $related_prods = DB::table('store_products as sp')
                         ->join('product_varient as pv', 'sp.varient_id', '=', 'pv.varient_id')
                         ->join('product as p', 'pv.product_id', '=', 'p.product_id')
-                       ->leftJoin('deal_product', function ($join) {
+                        ->leftJoin('deal_product', function ($join) {
                             $d = now();
                             $join->on('pv.varient_id', '=', 'deal_product.varient_id')
                                 ->where('deal_product.valid_from', '<=', $d)
                                 ->where('deal_product.valid_to', '>', $d);
-                        })  
+                        })
                         ->select(
                             'sp.store_id',
                             'sp.stock',
@@ -380,15 +366,14 @@ if (count($products) > 0) {
 
                 // return $related_prods;
                 return view('web.product.product_preview', compact("title", "logo", "category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone', 'related_prods', 'varient'));
-             } // else {
-            //     //    $message = array('status' => '2', 'message' => 'No Products Found Nearby', 'data' => []);
-            //     // return $message;
-            //     $prev_product = null;
-            //     return view('web.product.product_preview', compact("title", "logo", "category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone'))->withErrors('No Products Found Nearby');
-            // }
+            }  else {
+                $prev_product = null;
+                return view('web.product.product_preview', compact("title", "logo", "category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone'))->withErrors('No Products Found Nearby');
+             }
         }
         // else {
-        //       return view('web.product.product_preview', compact("title", "logo", "category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone'))->withErrors('No Products Found Nearby');
+        //        $prev_product = null;
+                // return view('web.product.product_preview', compact("title", "logo", "category", "category_sub", "category_child", "prev_product", 'cust', 'cust_phone'))->withErrors('No Products Found Nearby');
         // }
 
 

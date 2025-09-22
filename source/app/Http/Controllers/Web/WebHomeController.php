@@ -32,22 +32,17 @@ class WebHomeController extends Controller
         ];    
 
         
-        // $latest_category = $allProductController->latest_category_three();
-        //  $deal_products = $allProductController->deal_products();
-        // $latest_products = $allProductController->latest_products();
-        // $products_siding = $allProductController->products_siding();
-        // $cate_siding = $allProductController->cate_siding();
 
         $top_selling = $webOrderController->top_selling();
         $deal_products = $webCategoryController->dealproduct();
-        $whatsnew = $webOrderController->whatsnew();
+        $new_prods = $webOrderController->just_arrived_prod();
         $top_ten_cate = $webCategoryController->top_ten_cate();
         
         
 
                         
 
-        return view('web.home.main', compact('title','logo', 'cust', 'cust_phone', 'banners_list', 'top_selling', 'deal_products', 'whatsnew', 'top_ten_cate')); //'latest_category', 'latest_products' , 'products_siding', 'cate_siding'
+        return view('web.home.main', compact('title','logo', 'cust', 'cust_phone', 'banners_list', 'top_selling', 'deal_products', 'new_prods', 'top_ten_cate')); //'latest_category', 'latest_products' , 'products_siding', 'cate_siding'
     }
 
 

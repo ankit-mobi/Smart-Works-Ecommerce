@@ -44,9 +44,6 @@
                         Read Less
                       </button>
 
-
-
-
                       {{-- Price Section --}}
                       <div class="mt-3">
                         <span class="fw-bold h3 text-success me-2">₹{{ number_format($prev_product->price, 2) }}</span>
@@ -64,14 +61,44 @@
                       @endif
 
                       {{-- Stock / Add Button --}}
-                      <div class="mt-auto">
-                        @if ($prev_product->stock > 0)
-                          <button class="btn btn-success w-100 py-2">
-                            <i class="bi bi-cart-plus me-2"></i> Add to Cart
-                          </button>
-                        @else
-                          <span class="badge bg-danger w-100 py-3 fs-6">Out of Stock</span>
-                        @endif
+                      <div class="mt-auto">        
+                                    @if ($prev_product->stock > 0)
+                                        @php
+                                            $cart = session('cart', []);
+                                            $inCartQty = $cart[$prev_product->product_id]['quantity'] ?? 0;
+                                        @endphp
+
+                                        @if ($inCartQty > 0)
+                                            <div class="d-flex justify-content-between align-items-center border rounded p-1">
+                                                {{-- Decrease --}}
+                                                <form method="POST" action="{{ route('cart.update', $prev_product->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="decrease">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                                </form>
+
+                                                {{-- Quantity --}}
+                                                <span class="px-2">{{ $inCartQty }}</span>
+
+                                                {{-- Increase --}}
+                                                <form method="POST" action="{{ route('cart.update', $prev_product->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="increase">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            {{-- Add button --}}
+                                            <form method="POST" action="{{ route('cart.add', $prev_product->product_id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success w-100">
+                                                    Add + <i class="bi bi-plus-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                    @endif
                       </div>
                     </div>
                   </div>
@@ -133,15 +160,45 @@
                               <p class="small text-danger mb-2">{{ $discount }} Rs Off</p>
                             @endif
                             {{-- Stock / Add Button --}}
-                            <div>
-                              @if ($prod_vats->stock > 0)
-                                <button class="btn btn-sm btn-outline-success w-100">
-                                  Add + <i class="bi bi-plus-lg"></i>
-                                </button>
-                              @else
-                                <span class="badge bg-danger w-100 py-2">Out of Stock</span>
-                              @endif
-                            </div>
+                             <div>
+                                    @if ($prod_vats->stock > 0)
+                                        @php
+                                            $cart = session('cart', []);
+                                            $inCartQty = $cart[$prod_vats->product_id]['quantity'] ?? 0;
+                                        @endphp
+
+                                        @if ($inCartQty > 0)
+                                            <div class="d-flex justify-content-between align-items-center border rounded p-1">
+                                                {{-- Decrease --}}
+                                                <form method="POST" action="{{ route('cart.update', $prod_vats->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="decrease">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                                </form>
+
+                                                {{-- Quantity --}}
+                                                <span class="px-2">{{ $inCartQty }}</span>
+
+                                                {{-- Increase --}}
+                                                <form method="POST" action="{{ route('cart.update', $prod_vats->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="increase">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            {{-- Add button --}}
+                                            <form method="POST" action="{{ route('cart.add', $prod_vats->product_id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success w-100">
+                                                    Add + <i class="bi bi-plus-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                    @endif
+                                </div>
                           </div>
                         </div>
                         <hr>
@@ -195,15 +252,45 @@
                               <p class="small text-danger mb-2">{{ $discount }} Rs Off</p>
                             @endif
                             {{-- Stock / Add Button --}}
-                            <div>
-                              @if ($related_prod->stock > 0)
-                                <button class="btn btn-sm btn-outline-success w-100">
-                                  Add + <i class="bi bi-plus-lg"></i>
-                                </button>
-                              @else
-                                <span class="badge bg-danger w-100 py-2">Out of Stock</span>
-                              @endif
-                            </div>
+                             <div>
+                                    @if ($related_prod->stock > 0)
+                                        @php
+                                            $cart = session('cart', []);
+                                            $inCartQty = $cart[$related_prod->product_id]['quantity'] ?? 0;
+                                        @endphp
+
+                                        @if ($inCartQty > 0)
+                                            <div class="d-flex justify-content-between align-items-center border rounded p-1">
+                                                {{-- Decrease --}}
+                                                <form method="POST" action="{{ route('cart.update', $related_prod->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="decrease">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                                </form>
+
+                                                {{-- Quantity --}}
+                                                <span class="px-2">{{ $inCartQty }}</span>
+
+                                                {{-- Increase --}}
+                                                <form method="POST" action="{{ route('cart.update', $related_prod->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="increase">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            {{-- Add button --}}
+                                            <form method="POST" action="{{ route('cart.add', $related_prod->product_id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success w-100">
+                                                    Add + <i class="bi bi-plus-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                    @endif
+                                </div>
                           </div>
                         </div>
                         <hr>

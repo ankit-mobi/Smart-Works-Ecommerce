@@ -49,7 +49,7 @@ Route::get('/clear-cache', function () {
 // });
 
 
-
+//Route::get('delivery_info', 'AppController@delivery_info');  to select all time slot 
 
 
 Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'], function () {
@@ -88,9 +88,10 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::get('product/{id}/{store_id}', 'AllProductController@product_details')->name('product_detail');
 	// Route::post('search', 'WebSearchController@search')->name('search');
 
-	Route::get('top_selling', 'WebOrderController@top_selling')->name('topSelling'); //route not used but controller is used
-	// only for testing
-	//    Route::get('dealproduct', 'WebCategoryController@dealproduct');
+	Route::get('/our-products/{type}', 'WebProductPageController@our_products')->name('our.products');
+
+	// Route::get('top_selling', 'WebProductPageController@our_products')->name('topSelling');
+	// Route::get('dealproduct', 'WebProductPageController@our_products')->name('Alldeals');
 	// Route::get('whatsnew', 'WebOrderController@whatsnew');
 	//    Route::get('topten', 'WebCategoryController@top_ten_cate');
 	// Route::get('sidebar','WebHomeController@sidebar');
@@ -100,9 +101,17 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 
 
 	// Route for adding a product to the cart
-	Route::post('/cart/add', 'CartController@add')->name('cart.add');
-	Route::get('/cart', 'CartController@index')->name('cart.index');
-	Route::get('/cart', 'WebOrderController@cartcheckout')->name('cart.checkout');
+Route::post('/cart/add/{id}', 'CartController@add')->name('cart.add');
+Route::post('/cart/update/{id}', 'CartController@update')->name('cart.update');
+Route::post('/cart/remove/{id}', 'CartController@remove')->name('cart.remove');
+
+
+
+
+
+	// Route::post('/cart/add', 'CartController@add')->name('cart.add');
+	// Route::get('/cart', 'CartController@index')->name('cart.index');
+	// Route::get('/cart', 'WebOrderController@cartcheckout')->name('cart.checkout');
 	// Cart
 	// Route::get('cart', 'CartController@index')->name('cart');
 	// Route::post('cart/add', 'CartController@add')->name('cart.add');

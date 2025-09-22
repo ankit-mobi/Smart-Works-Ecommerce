@@ -2,7 +2,7 @@
 
 @section('content')
 
-     {{-- alert handling --}}
+    {{-- alert handling --}}
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -40,7 +40,7 @@
     <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="text-uppercase">Top Selling</h3>
-            <a href="{{ route('products') }}" class="btn btn-outline-primary btn-sm">View All</a>
+            <a href="{{ route('our.products', ['type' => 1]) }}" class="btn btn-outline-primary btn-sm">View All</a>
         </div>
 
         <div class="row g-4">
@@ -49,17 +49,19 @@
                     <div class="card h-100 shadow-sm border-0">
                         {{-- Product Image --}}
                         <div class="text-center p-3 bg-light">
-                            <a href="{{route('product_detail', ['id' =>$topsells->product_id, 'store_id' => $topsells->store_id])}}" style="text-decoration: none; color: inherit;">
-                            <img src="{{ asset($topsells->product_image) }}" alt="{{ $topsells->product_name }}"
-                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"></a>
+                            <a href="{{route('product_detail', ['id' => $topsells->product_id, 'store_id' => $topsells->store_id])}}"
+                                style="text-decoration: none; color: inherit;">
+                                <img src="{{ asset($topsells->product_image) }}" alt="{{ $topsells->product_name }}"
+                                    class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"></a>
                         </div>
 
                         {{-- Product Details --}}
                         <div class="card-body d-flex flex-column">
-                            <a href="{{route('product_detail', ['id' =>$topsells->product_id, 'store_id' => $topsells->store_id])}}" style="text-decoration: none; color:inherit">
-                            <h6 class="card-title text-truncate">{{ $topsells->product_name }}</h6>
-                            <p class="text-muted small mb-2">{{ Str::limit($topsells->description, 60) }}</p>
-                        </a>
+                            <a href="{{route('product_detail', ['id' => $topsells->product_id, 'store_id' => $topsells->store_id])}}"
+                                style="text-decoration: none; color:inherit">
+                                <h6 class="card-title text-truncate">{{ $topsells->product_name }}</h6>
+                                <p class="text-muted small mb-2">{{ Str::limit($topsells->description, 60) }}</p>
+                            </a>
 
                             <div class="mt-auto">
                                 {{-- Price & Discount --}}
@@ -78,15 +80,47 @@
                                 {{-- Stock / Add Button --}}
                                 <div>
                                     @if ($topsells->stock > 0)
-                                        <button class="btn btn-sm btn-outline-success w-100">
-                                            Add + <i class="bi bi-plus-lg"></i>
-                                        </button>
+                                        @php
+                                            $cart = session('cart', []);
+                                            $inCartQty = $cart[$topsells->product_id]['quantity'] ?? 0;
+                                        @endphp
+
+                                        @if ($inCartQty > 0)
+                                            <div class="d-flex justify-content-between align-items-center border rounded p-1">
+                                                {{-- Decrease --}}
+                                                <form method="POST" action="{{ route('cart.update', $topsells->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="decrease">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                                </form>
+
+                                                {{-- Quantity --}}
+                                                <span class="px-2">{{ $inCartQty }}</span>
+
+                                                {{-- Increase --}}
+                                                <form method="POST" action="{{ route('cart.update', $topsells->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="increase">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            {{-- Add button --}}
+                                            <form method="POST" action="{{ route('cart.add', $topsells->product_id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success w-100">
+                                                    Add + <i class="bi bi-plus-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     @else
                                         <span class="badge bg-danger w-100 py-2">Out of Stock</span>
                                     @endif
                                 </div>
+
                             </div>
-                        </div><hr>
+                        </div>
+                        <hr>
                     </div>
                 </div>
             @endforeach
@@ -96,86 +130,120 @@
 
     {{-- Deals of the Day --}}
     @if(isset($deal_products) && !$deal_products->isEmpty())
-    <div class="container-fluid my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
-            <h3 class="text-uppercase">Deals of the Day</h3>
-            <a href="" class="btn btn-outline-primary btn-sm">View All</a>
-        </div>
+        <div class="container-fluid my-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
+                <h3 class="text-uppercase">Deals of the Day</h3>
+                <a href="{{ route('our.products', ['type' => 2]) }}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
 
-        <div id="dealsCarousel" class="carousel slide" data-bs-ride="false">
-            <div class="carousel-inner">
-                @foreach($deal_products->chunk(4) as $chunkIndex => $dealChunk)
-                    <div class="carousel-item {{ $chunkIndex == 0 ? 'active' : '' }}">
-                        <div class="row g-4 mx-5">
-                            @foreach($dealChunk as $deal)
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="card h-100 shadow-sm border-0">
-                                        {{-- Image --}}
-                                        <div class="text-center p-3 bg-light">
-                                             <a href="{{route('product_detail', ['id' =>$deal->product_id, 'store_id' => $deal->store_id])}}" style="text-decoration: none; color: inherit;">
-                                            <img src="{{ asset($deal->product_image) }}" alt="{{ $deal->product_name }}"
-                                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"> </a>
-                                        </div>
-
-                                        {{-- Product Details --}}
-                                        <div class="card-body d-flex flex-column">
-                                               <a href="{{route('product_detail', ['id' =>$deal->product_id, 'store_id' => $deal->store_id])}}" style="text-decoration: none; color: inherit;">
-                                            <h6 class="card-title text-truncate">{{ $deal->product_name }}</h6>
-                                            <p class="text-muted small mb-2">{{ Str::limit($deal->description, 60) }}</p></a>
-
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold text-success">₹{{ number_format($deal->price) }}</span>
-                                                <span class="text-muted small">
-                                                    <del>₹{{ number_format($deal->mrp) }}</del>
-                                                </span>
+            <div id="dealsCarousel" class="carousel slide" data-bs-ride="false">
+                <div class="carousel-inner">
+                    @foreach($deal_products->chunk(4) as $chunkIndex => $dealChunk)
+                        <div class="carousel-item {{ $chunkIndex == 0 ? 'active' : '' }}">
+                            <div class="row g-4 mx-5">
+                                @foreach($dealChunk as $deal)
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="card h-100 shadow-sm border-0">
+                                            {{-- Image --}}
+                                            <div class="text-center p-3 bg-light">
+                                                <a href="{{route('product_detail', ['id' => $deal->product_id, 'store_id' => $deal->store_id])}}"
+                                                    style="text-decoration: none; color: inherit;">
+                                                    <img src="{{ asset($deal->product_image) }}" alt="{{ $deal->product_name }}"
+                                                        class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"> </a>
                                             </div>
 
-                                            @php
-                                                $discount = $deal->mrp - $deal->price;
-                                            @endphp
-                                            @if($discount > 0)
-                                                <p class="small text-danger mb-2">{{ number_format($discount) }} Rs Off</p>
-                                            @endif
+                                            {{-- Product Details --}}
+                                            <div class="card-body d-flex flex-column">
+                                                <a href="{{route('product_detail', ['id' => $deal->product_id, 'store_id' => $deal->store_id])}}"
+                                                    style="text-decoration: none; color: inherit;">
+                                                    <h6 class="card-title text-truncate">{{ $deal->product_name }}</h6>
+                                                    <p class="text-muted small mb-2">{{ Str::limit($deal->description, 60) }}</p>
+                                                </a>
 
-                                            {{-- Countdown Timer --}}
-                                            <div class="d-flex align-items-center text-warning small mb-2">
-                                                <i class="fa-solid fa-stopwatch me-1"></i>
-                                                <span class="countdown-timer"
-                                                    data-endtime="{{ \Carbon\Carbon::parse($deal->valid_to)->timestamp }}">
-                                                    Loading...
-                                                </span>
-                                            </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold text-success">₹{{ number_format($deal->price) }}</span>
+                                                    <span class="text-muted small">
+                                                        <del>₹{{ number_format($deal->mrp) }}</del>
+                                                    </span>
+                                                </div>
 
-                                            {{-- Stock / Add Button --}}
-                                            <div class="mt-auto">
-                                                @if ($deal->stock > 0)
-                                                    <button class="btn btn-sm btn-outline-success w-100">
-                                                        Add <i class="bi bi-plus-lg"></i>
-                                                    </button>
-                                                @else
-                                                    <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                                @php
+                                                    $discount = $deal->mrp - $deal->price;
+                                                @endphp
+                                                @if($discount > 0)
+                                                    <p class="small text-danger mb-2">{{ number_format($discount) }} Rs Off</p>
                                                 @endif
+
+                                                {{-- Countdown Timer --}}
+                                                <div class="d-flex align-items-center text-warning small mb-2">
+                                                    <i class="fa-solid fa-stopwatch me-1"></i>
+                                                    <span class="countdown-timer"
+                                                        data-endtime="{{ \Carbon\Carbon::parse($deal->valid_to)->timestamp }}">
+                                                        Loading...
+                                                    </span>
+                                                </div>
+
+                                                {{-- Stock / Add Button --}}
+                                                <div class="mt-auto">
+                                                    @if ($deal->stock > 0)
+
+                                                        @php
+                                                            $cart = session('cart', []);
+                                                            $inCartQty = $cart[$deal->product_id]['quantity'] ?? 0;
+                                                        @endphp
+
+                                                        @if ($inCartQty > 0)
+                                                            <div class="d-flex justify-content-between align-items-center border rounded p-1">
+                                                                {{-- Decrease --}}
+                                                                <form method="POST" action="{{ route('cart.update', $deal->product_id) }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="action" value="decrease">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                                                </form>
+
+                                                                {{-- Quantity --}}
+                                                                <span class="px-2">{{ $inCartQty }}</span>
+
+                                                                {{-- Increase --}}
+                                                                <form method="POST" action="{{ route('cart.update', $deal->product_id) }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="action" value="increase">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                                                                </form>
+                                                            </div>
+                                                        @else
+                                                            {{-- Add button --}}
+                                                            <form method="POST" action="{{ route('cart.add', $deal->product_id) }}">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-outline-success w-100">
+                                                                    Add + <i class="bi bi-plus-lg"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    @else
+                                                        <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
 
-            {{-- Custom Small Carousel Controls --}}
-            <div class="carousel-controls-container">
-                <button class="carousel-control-prev" type="button" data-bs-target="#dealsCarousel" data-bs-slide="prev">
-                    <span class="custom-control-icon">&lt;</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#dealsCarousel" data-bs-slide="next">
-                    <span class="custom-control-icon">&gt;</span>
-                </button>
+                {{-- Custom Small Carousel Controls --}}
+                <div class="carousel-controls-container">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#dealsCarousel" data-bs-slide="prev">
+                        <span class="custom-control-icon">&lt;</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#dealsCarousel" data-bs-slide="next">
+                        <span class="custom-control-icon">&gt;</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
     @endif
     <br>
 
@@ -203,111 +271,153 @@
     <br><br>
 
     {{-- Just Arrived Products --}}
-    @if(isset($whatsnew) && !$whatsnew->isEmpty())
-    <div class="container-fluid my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
-            <h3 class="text-uppercase">Just Arrived Products</h3>
-            <a href="" class="btn btn-outline-primary btn-sm">View All</a>
-        </div>
+    @if(isset($new_prods) && !$new_prods->isEmpty())
+        <div class="container-fluid my-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
+                <h3 class="text-uppercase">Just Arrived Products</h3>
+                <a href="{{ route('our.products', ['type' => 3]) }}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
 
-        <div id="arrivedCarousel" class="carousel slide" data-bs-ride="false">
-            <div class="carousel-inner">
-                @foreach($whatsnew->chunk(4) as $chunkIndex => $new_prods)
-                    <div class="carousel-item {{ $chunkIndex == 0 ? 'active' : '' }}">
-                        <div class="row g-4 mx-5">
-                            @foreach($new_prods as $new_prod)
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="card h-100 shadow-sm border-0">
-                                        {{-- Image --}}
-                                        <div class="text-center p-3 bg-light">
-                                            <a href="{{route('product_detail', ['id' =>$new_prod->product_id, 'store_id' => $new_prod->store_id])}}" style="text-decoration: none; color: inherit;">
-                                            <img src="{{ asset($new_prod->product_image) }}" alt="{{ $new_prod->product_name }}"
-                                                class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"></a>
-                                        </div>
-
-                                        {{-- Product Details --}}
-                                        <div class="card-body d-flex flex-column">
-                                            <a href="{{route('product_detail', ['id' =>$new_prod->product_id, 'store_id' => $new_prod->store_id])}}" style="text-decoration: none; color: inherit;">
-                                            <h6 class="card-title text-truncate">{{ $new_prod->product_name }}</h6>
-                                            <p class="text-muted small mb-2">{{ Str::limit($new_prod->description, 60) }}</p></a>
-
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold text-success">₹{{ number_format($new_prod->price) }}</span>
-                                                <span class="text-muted small">
-                                                    <del>₹{{ number_format($new_prod->mrp) }}</del>
-                                                </span>
+            <div id="arrivedCarousel" class="carousel slide" data-bs-ride="false">
+                <div class="carousel-inner">
+                    @foreach($new_prods->chunk(4) as $chunkIndex => $new_prods)
+                        <div class="carousel-item {{ $chunkIndex == 0 ? 'active' : '' }}">
+                            <div class="row g-4 mx-5">
+                                @foreach($new_prods as $new_prod)
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="card h-100 shadow-sm border-0">
+                                            {{-- Image --}}
+                                            <div class="text-center p-3 bg-light">
+                                                <a href="{{route('product_detail', ['id' => $new_prod->product_id, 'store_id' => $new_prod->store_id])}}"
+                                                    style="text-decoration: none; color: inherit;">
+                                                    <img src="{{ asset($new_prod->product_image) }}" alt="{{ $new_prod->product_name }}"
+                                                        class="img-fluid rounded" style="max-height: 220px; object-fit: contain;"></a>
                                             </div>
 
-                                            @php
-                                                $discount = $new_prod->mrp - $new_prod->price;
-                                            @endphp
-                                            @if($discount > 0)
-                                                <p class="small text-danger mb-2">{{ number_format($discount) }} Rs Off</p>
-                                            @endif
+                                            {{-- Product Details --}}
+                                            <div class="card-body d-flex flex-column">
+                                                <a href="{{route('product_detail', ['id' => $new_prod->product_id, 'store_id' => $new_prod->store_id])}}"
+                                                    style="text-decoration: none; color: inherit;">
+                                                    <h6 class="card-title text-truncate">{{ $new_prod->product_name }}</h6>
+                                                    <p class="text-muted small mb-2">{{ Str::limit($new_prod->description, 60) }}</p>
+                                                </a>
 
-                                            
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold text-success">₹{{ number_format($new_prod->price) }}</span>
+                                                    <span class="text-muted small">
+                                                        <del>₹{{ number_format($new_prod->mrp) }}</del>
+                                                    </span>
+                                                </div>
 
-                                            {{-- Stock / Add Button --}}
-                                            <div class="mt-auto">
-                                                @if ($new_prod->stock > 0)
-                                                    <button class="btn btn-sm btn-outline-success w-100">
-                                                        Add <i class="bi bi-plus-lg"></i>
-                                                    </button>
-                                                @else
-                                                    <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                                @php
+                                                    $discount = $new_prod->mrp - $new_prod->price;
+                                                @endphp
+                                                @if($discount > 0)
+                                                    <p class="small text-danger mb-2">{{ number_format($discount) }} Rs Off</p>
                                                 @endif
+
+
+
+                                                {{-- Stock / Add Button --}}
+                                                <div class="mt-auto">
+                                                    @if ($new_prod->stock > 0)
+                                                        
+                                        @php
+                                            $cart = session('cart', []);
+                                            $inCartQty = $cart[$new_prod->product_id]['quantity'] ?? 0;
+                                        @endphp
+
+                                        @if ($inCartQty > 0)
+                                            <div class="d-flex justify-content-between align-items-center border rounded p-1">
+                                                {{-- Decrease --}}
+                                                <form method="POST" action="{{ route('cart.update', $new_prod->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="decrease">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                                </form>
+
+                                                {{-- Quantity --}}
+                                                <span class="px-2">{{ $inCartQty }}</span>
+
+                                                {{-- Increase --}}
+                                                <form method="POST" action="{{ route('cart.update', $new_prod->product_id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="increase">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            {{-- Add button --}}
+                                            <form method="POST" action="{{ route('cart.add', $new_prod->product_id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success w-100">
+                                                    Add + <i class="bi bi-plus-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <span class="badge bg-danger w-100 py-2">Out of Stock</span>
+                                    @endif
+                                
+
+
+
+
+
+
+
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
 
-            {{-- Custom Small Carousel Controls --}}
-            <div class="carousel-controls-container">
-                <button class="carousel-control-prev" type="button" data-bs-target="#arrivedCarousel" data-bs-slide="prev">
-                    <span class="custom-control-icon">&lt;</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#arrivedCarousel" data-bs-slide="next">
-                    <span class="custom-control-icon">&gt;</span>
-                </button>
+                {{-- Custom Small Carousel Controls --}}
+                <div class="carousel-controls-container">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#arrivedCarousel" data-bs-slide="prev">
+                        <span class="custom-control-icon">&lt;</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#arrivedCarousel" data-bs-slide="next">
+                        <span class="custom-control-icon">&gt;</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
     @endif
 
 
 
     {{-- Top Categories --}}
     @if(isset($top_ten_cate) && !$top_ten_cate->isEmpty())
-    <div class="container-fluid my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
-            <h3 >Top Categories</h3>
-            <a href="" class="btn btn-outline-primary btn-sm">View All</a>
+        <div class="container-fluid my-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 mx-5">
+                <h3>Top Categories</h3>
+                <a href="{{ route("products") }}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="product-grid">
+                @foreach($top_ten_cate as $cate)
+                    <a href="{{route('catee', ['cat_id' => $cate->cat_id])}}" class="category-card">
+                        <div class="category-image-wrapper">
+                            <img src="{{ asset($cate->image) }}" alt="{{ $cate->title }}" class="category-image">
+                        </div>
+                        <div class="category-details">
+                            <h5 class="category-name">{{ $cate->title }}</h5>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
         </div>
-    <div class="product-grid">
-        @foreach($top_ten_cate as $cate)
-            <a href="{{route('catee', ['cat_id' => $cate->cat_id])}}" class="category-card">
-                <div class="category-image-wrapper">
-                    <img src="{{ asset($cate->image) }}" alt="{{ $cate->title }}" class="category-image">
-                </div>
-                <div class="category-details">
-                    <h5 class="category-name">{{ $cate->title }}</h5>
-                </div>
-            </a>
-        @endforeach
-    </div>
-    </div>
     @endif
 
 
 
     <style>
-
-         /*for banners*/
+        /*for banners*/
         .carousel-img {
             height: 50vh;
             object-fit: cover;
@@ -329,10 +439,12 @@
             /* Keep them always visible */
             transition: all 0.2s ease-in-out;
         }
+
         #dealsCarousel .carousel-control-prev:hover,
         #dealsCarousel .carousel-control-next:hover {
             background-color: #9b9696;
         }
+
         .custom-control-icon {
             font-size: 1.5rem;
             color: #333;
@@ -354,12 +466,13 @@
             /* Keep them always visible */
             transition: all 0.2s ease-in-out;
         }
+
         #arrivedCarousel .carousel-control-prev:hover,
         #arrivedCarousel .carousel-control-next:hover {
             background-color: #9b9696;
         }
 
-         /* category-card */
+        /* category-card */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -378,35 +491,42 @@
             transition: transform 0.2s, box-shadow 0.2s;
             background-color: #fff;
         }
+
         .category-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
+
         .category-image-wrapper {
             width: 100%;
             height: 180px;
             overflow: hidden;
             position: relative;
         }
+
         .category-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.3s ease-in-out;
         }
+
         .category-card:hover .category-image {
             transform: scale(1.05);
         }
+
         .category-details {
             padding: 15px;
             text-align: center;
         }
+
         .category-name {
             font-size: 1.25rem;
             font-weight: 600;
             color: #333;
             margin: 0 0 5px;
         }
+
         .category-description {
             font-size: 0.9rem;
             color: #777;

@@ -23,35 +23,6 @@ class UserloginController extends Controller
   	return view('web.auth.login', compact('logo'));
   }
 
-  /*
-  public function logincheck(Request $request)
-  {	
-  	$phone= $request->phone;
-    $password = $request->password;
-    $device_id = $request->device_id;
-
-
-
-
-    $custLoginCheck = DB::table('users')
-                    ->where('user_phone', $phone)
-            	    ->first();
-
-    if($custLoginCheck){
-      if ($password==$custLoginCheck->user_password) {
-        Session::put('bamaCust', $phone);
-        Session::save();
-        return redirect()->route('webhome');
-      }
-      else{
-        return redirect()->route('userLogin')->withErrors('Wrong Password');
-      }
-    }
-    else{
-      return redirect()->route('userLogin')->withErrors('Phone/Password Wrong');
-    }
-  }*/
-  
    public function logincheck(Request $request)
     {
         

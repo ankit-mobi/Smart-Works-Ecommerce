@@ -2,9 +2,10 @@
     <div class="container">
 
         <a class="navbar-brand d-flex align-items-center" href="{{ route('webhome') }}">
-            <img src="{{url($logo->icon)}}" alt=" Logo" height="35" class="me-2">  {{--src="{{ url('webstyle/image/logo.PNG') }}"--}}
-            {{-- <span class="fw-bold fs-5">{{$logo->name}} User</span>  --}}
-          
+            <img src="{{url($logo->icon)}}" alt=" Logo" height="35" class="me-2"> {{--src="{{
+            url('webstyle/image/logo.PNG') }}"--}}
+            {{-- <span class="fw-bold fs-5">{{$logo->name}} User</span> --}}
+
         </a>
         </a>
 
@@ -30,48 +31,61 @@
             </ul>
 
             <form class="d-flex mx-lg-auto my-2 my-lg-0 w-lg-50" action="{{ route('search.product') }}" method="GET">
-    <div class="input-group">
-        <input id="searchInput" name="keyword" class="form-control" type="search"
-               placeholder="Search products..." aria-label="Search" required>
-        <button class="btn btn-primary" type="submit">
-            <i class="fas fa-search"></i>
-        </button>
-        <button class="btn btn-outline-secondary" type="button" id="voiceSearchBtn">
-            <i class="fas fa-microphone"></i>
-        </button>
-    </div>
-</form>
+                <div class="input-group">
+                    <input id="searchInput" name="keyword" class="form-control" type="search"
+                        placeholder="Search products..." aria-label="Search" required>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="button" id="voiceSearchBtn">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </form>
 
             <ul class="navbar-nav ms-lg-auto d-flex flex-row align-items-center">
                 {{-- User Profile/Login --}}
                 @if(Session::has('bamaCust'))
-                <li class="nav-item dropdown me-2">
-                    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{ url('webstyle/image/panga.PNG') }}" alt="Profile" height="30" class="rounded-circle me-1">
-                        <span class="d-none d-lg-inline-block">Welcome {{ Session::get('bamaCust')->user_name ?? '' }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                        <li><a class="dropdown-item" href="{{ route('profile') }}">My Profile</a></li>
-                        <li><a class="dropdown-item" href="#">My Orders</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="{{ route('userlogout') }}">Logout</a></li>
-                    </ul>
-                </li>
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ url('webstyle/image/panga.PNG') }}" alt="Profile" height="30"
+                                class="rounded-circle me-1">
+                            <span class="d-none d-lg-inline-block">Welcome
+                                {{ Session::get('bamaCust')->user_name ?? '' }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{{ route('profile') }}">My Profile</a></li>
+                            <li><a class="dropdown-item" href="#">My Orders</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="{{ route('userlogout') }}">Logout</a></li>
+                        </ul>
+                    </li>
                 @else
-                <li class="nav-item me-2">
-                    <a class="nav-link" href="{{ route('userLogin') }}">
-                        <i class="fas fa-user-circle fs-5"></i> {{-- Font Awesome User Icon --}}
-                        <span class="d-none d-lg-inline-block ms-1">Sign In</span>
-                    </a>
-                </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link" href="{{ route('userLogin') }}">
+                            <i class="fas fa-user-circle fs-5"></i> {{-- Font Awesome User Icon --}}
+                            <span class="d-none d-lg-inline-block ms-1">Sign In</span>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- Cart --}}
+                @php
+    $totalItems = 0;
+    if(session('cart')){
+        foreach(session('cart') as $item){
+            $totalItems += $item['quantity'];
+        }
+    }
+@endphp
                 <li class="nav-item">
                     <a class="nav-link position-relative" href="#" onclick="openNav()">
                         <i class="fas fa-shopping-cart fs-5"></i> {{-- Font Awesome Cart Icon --}}
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            10
+                            {{$totalItems}}
                         </span>
                     </a>
                 </li>
@@ -82,98 +96,111 @@
 
 <div id="mySidepanel" class="sidepanel shadow-lg">
     <h5 class="sidenav_h5">
-        My Cart 
+        My Cart
         <span class="sidenav_span" onclick="closeNav()">
-            
+
             <i class="fas fa-times" style="font-size: 15px; color: black;"></i>
         </span>
     </h5>
 
     <div class="header_overflow">
         {{-- Check if the cart is not empty --}}
-        @if (!empty($items) && count($items) > 0)
-            @php
-                $subtotal = 0;
-                $taxTotal = 0; // Assuming a tax rate for calculation
-                $shippingTotal = 0;
-            @endphp
-            
+        @if(session('cart'))
+
             {{-- Loop through each item in the cart --}}
-            @foreach ($items as $item)
-                @php
-                    // Calculate totals
-                    $subtotal += $item->line_total;
-                    // Add your tax logic here, e.g., 5%
-                    $taxTotal += $item->line_total * 0.05; 
-                @endphp
+            @foreach (session('cart') as $item)
 
                 <hr style="margin-top: -8px; margin-bottom: -8px;">
 
                 <div class="row" style="padding: 15px 10px 5px 10px;">
                     <div class="col-sm-1">
                         {{-- Assuming 'varient_image' is a column in your database --}}
-                        <img src="{{ asset( $item->varient_image) }}" height="40">                      
+                        <img src="{{ asset($item['image']) }}" height="40">
                     </div>
 
                     <div class="col-sm-4">
                         {{-- You'll need to join with product table to get the name --}}
-                        <p style="font-size: 14px; margin-left: 12px;">{{ $item->product_name ?? 'Product Name' }}</p>
-                        <p class="header_para_34">Pack Size: N/A | Quantity: {{ $item->qty }}</p>
+                        <p style="font-size: 14px; margin-left: 12px;">{{ $item['name'] ?? 'Product Name' }}</p>
+                        <p class="header_para_34">Rs: {{ $item['price'] * $item['quantity'] }}</p>
+                        <p class="header_para_34">Quantity: {{ $item['quantity'] }}</p>
                     </div>
 
                     <div class="col-sm-3">
-                        <div class="btn-group btn-group-sm but_div3" role="group" aria-label="...">
-                            <button class="but_minus3"><i class="fas fa-minus"></i></button>
-                            <button class="but_one3"><input type="number" style="border: 0; width: 29px; outline: none;" value="{{ $item->qty }}" name="qty"></button>
-                            <button class="but_plus3"><i class="fas fa-plus"></i></button>
-                        </div>
+                        <div class="d-flex justify-content-center align-items-center rounded p-1">
+                {{-- Decrease --}}
+                <form method="POST" action="{{ route('cart.update', $item['product_id']) }}" class="m-0">
+                    @csrf
+                    <input type="hidden" name="action" value="decrease">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                </form>
+
+                {{-- Quantity --}}
+                <span class="px-3">{{ $item['quantity'] }}</span>
+
+                {{-- Increase --}}
+                <form method="POST" action="{{ route('cart.update', $item['product_id']) }}" class="m-0">
+                    @csrf
+                    <input type="hidden" name="action" value="increase">
+                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                </form>
+            </div>      
                     </div>
 
-                    <div class="col-sm-2">
-                        <p class="cart_para">${{ number_format($item->line_total, 2) }}</p>
-                    </div>
 
-                    <div class="col-sm-2">
-                        <i class="fas fa-times-circle cart_font text-danger" onclick="remove_cart_item()"></i>
-                    </div>
+
+                    {{-- Remove --}}
+        <div class="col-sm-2 text-end">
+            <form method="POST" action="{{ route('cart.remove', $item['product_id']) }}">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-link text-danger">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </form>
+        </div>
                 </div>
             @endforeach
 
         @else
             {{-- Display message if the cart is empty --}}
-            <p style="text-align: center; padding: 20px;">Your cart is empty.</p>
+            <p style="text-align: center; padding: 20px;" class="text-uppercase"><b>No items in the cart</b></p>
+            <p style="text-align: center" class="text-muted small mb-2">Please add some of the items in cart that will appear here</p>
+            <br><br>
+            <a href="{{route('products')}}" class="text-center">SHOP NOW</a>
+
         @endif
     </div>
 
-    @if (!empty($items) && count($items) > 0)
-        <div class="card header_card12">
-            <div class="card-body">
-                @php
-                    // Assuming a fixed shipping fee for this example
-                    $shippingTotal = 5.00; 
-                    $grandTotal = $subtotal + $taxTotal + $shippingTotal;
-                @endphp
+    @php
+    $totalItems = 0;
+    $grandTotal = 0;
 
-                <p class="header_para454">
-                    Sub Total <span style="float: right;">${{ number_format($subtotal, 2) }}</span>
-                </p>
+    if(session('cart')){
+        foreach(session('cart') as $item){
+            $totalItems += $item['quantity'];
+            $grandTotal += $item['price'] * $item['quantity'];
+        }
+    }
+@endphp
 
-                <p class="header_para454">
-                    Tax <span style="float: right;">${{ number_format($taxTotal, 2) }}</span>
-                </p>
 
-                <p class="header_span99">
-                    Net Payable <span style="float: right;">${{ number_format($grandTotal, 2) }}</span>
-                </p>
+   @if(session('cart') && count(session('cart')) > 0)
+    <div class="card header_card12">
+        <div class="card-body">
 
-                <a href="{{ route('cart.checkout') }}" style="width: 45%; display: inline-block;">
-                    <button class="btn header_viewbag">View Bag</button>
-                </a>
-                <button class="btn header_pay_to">Proceed To pay</button>
+            <p class="header_span99">
+                Total Items : <span style="float: right;">{{ $totalItems }}</span>
+            </p>
 
-            </div>
+            <p class="header_span99">
+                Total Payable : <span style="float: right;">Rs {{ number_format($grandTotal, 2) }}</span>
+            </p>
+
+            <button class="btn header_pay_to">Proceed To Pay</button>
+
         </div>
-    @endif
+    </div>
+@endif
+
 </div>
 
 <script>
@@ -187,54 +214,55 @@
         document.getElementById("mySidepanel").style.width = "0";
     }
 
-    function remove_cart_item(){
+    function remove_cart_item() {
         // remove cart item
-    //  const productId = element.getAttribute('data-product-id');
+        //  const productId = element.getAttribute('data-product-id');
 
-    //  remove_from_db(productId);
+        //  remove_from_db(productId);
     }
 
 </script>
 
+{{--
 <script>
-$(document).ready(function() {
-    $('.add-to-cart-btn').on('click', function(e) {
-        e.preventDefault(); // Stop the default page reload
+    $(document).ready(function () {
+        $('.add-to-cart-btn').on('click', function (e) {
+            e.preventDefault(); // Stop the default page reload
 
-        let varientId = $(this).data('varient-id');
-        let qty = $(this).data('qty');
-        let url = "{{ route('cart.add') }}";
-        let csrfToken = "{{ csrf_token() }}";
+            let varientId = $(this).data('varient-id');
+            let qty = $(this).data('qty');
+            let url = "{{ route('cart.add') }}";
+            let csrfToken = "{{ csrf_token() }}";
 
-        // Show a loading indicator (optional)
-        $(this).text('Adding...').prop('disabled', true);
+            // Show a loading indicator (optional)
+            $(this).text('Adding...').prop('disabled', true);
 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: {
-                _token: csrfToken,
-                varient_id: varientId,
-                qty: qty
-            },
-            success: function(response) {
-        
-                // You can update a cart counter here
-                $('#cart-count').text(response.cart_count);
-            
-                // Restore the button state
-                $('.add-to-cart-btn').text('Add to Cart').prop('disabled', false);
-            },
-            error: function(xhr) {
-                // Handle any errors
-                console.error(xhr.responseText);
-                $('.add-to-cart-btn').text('Add to Cart').prop('disabled', false);
-                alert('An error occurred!');
-            }
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    _token: csrfToken,
+                    varient_id: varientId,
+                    qty: qty
+                },
+                success: function (response) {
+
+                    // You can update a cart counter here
+                    $('#cart-count').text(response.cart_count);
+
+                    // Restore the button state
+                    $('.add-to-cart-btn').text('Add to Cart').prop('disabled', false);
+                },
+                error: function (xhr) {
+                    // Handle any errors
+                    console.error(xhr.responseText);
+                    $('.add-to-cart-btn').text('Add to Cart').prop('disabled', false);
+                    alert('An error occurred!');
+                }
+            });
         });
     });
-});
-</script>
+</script> --}}
 
 <script>
     // Voice Search (Web Speech API)
@@ -263,4 +291,3 @@ $(document).ready(function() {
         voiceBtn.title = "Voice search not supported in this browser";
     }
 </script>
-
