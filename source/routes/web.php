@@ -54,7 +54,7 @@ Route::get('/clear-cache', function () {
 
 Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'], function () {
 
-	
+
 	//pre
 	Route::get('sign-up', 'RegisterController@register_user')->name('userregister');
 	Route::post('registration', 'RegisterController@usersignup')->name('user_registration');
@@ -72,10 +72,6 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::get('search', 'WebSearchController@search_web')->name('search.product');
 
 
-
-
-
-
 	// Home & Pages Access without login
 	Route::get('/', 'WebHomeController@web')->name('webhome'); //pre        //done
 	Route::get('about', 'WebHomeController@aboutus')->name('webabout');   //pre  //doneF
@@ -86,7 +82,6 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	Route::get('products', 'AllProductController@products')->name('products'); //pre
 	Route::get('products/{cat_id}', 'AllProductController@cate')->name('catee'); //pre
 	Route::get('product/{id}/{store_id}', 'AllProductController@product_details')->name('product_detail');
-	// Route::post('search', 'WebSearchController@search')->name('search');
 
 	Route::get('/our-products/{type}', 'WebProductPageController@our_products')->name('our.products');
 
@@ -96,69 +91,59 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 	//    Route::get('topten', 'WebCategoryController@top_ten_cate');
 	// Route::get('sidebar','WebHomeController@sidebar');
 
-	
-
-
-
 	// Route for adding a product to the cart
-Route::post('/cart/add/{id}', 'CartController@add')->name('cart.add');
-Route::post('/cart/update/{id}', 'CartController@update')->name('cart.update');
-Route::post('/cart/remove/{id}', 'CartController@remove')->name('cart.remove');
+	Route::post('/cart/add/{id}/{store_id}', 'CartController@add')->name('cart.add');
+	Route::post('/cart/update/{id}/{store_id}', 'CartController@update')->name('cart.update');
+	Route::post('/cart/remove/{id}/{store_id}', 'CartController@remove')->name('cart.remove');
 
 
-
-
-
-	// Route::post('/cart/add', 'CartController@add')->name('cart.add');
-	// Route::get('/cart', 'CartController@index')->name('cart.index');
-	// Route::get('/cart', 'WebOrderController@cartcheckout')->name('cart.checkout');
-	// Cart
-	// Route::get('cart', 'CartController@index')->name('cart');
-	// Route::post('cart/add', 'CartController@add')->name('cart.add');
-	// Route::post('cart/update', 'CartController@update')->name('cart.update');
-	// Route::post('cart/remove', 'CartController@remove')->name('cart.remove');
-
-
-
-
-	
 
 
 	// --------------------------
 	// Auth protected
 	Route::group(['middleware' => 'bamaCust'], function () {
 
+
+		/////user_block_check////
+		//  Route::get('user_block_check', 'UserController@user_block_check');
+
 		// Profile
 		Route::get('profile', 'WebUserController@profile')->name('profile');
 		// profile edit
 		Route::post('profile/update', 'UserController@update')->name('profile.update');
 
-		
+
 		// Coupons
 		// Route::post('coupon/apply', 'CouponController@apply')->name('coupon.apply');
 		// Route::get('coupon/list', 'CouponController@list')->name('coupon.list');
 
-		
-        //user profiles
-		// Route::post('myprofile', 'WebUserController@myprofile');
-		// //////address///////
+
+
+		// Address Management
+		// Route::get('address', 'AddressController@index')->name('address.index');
+		Route::post('show_address', 'WebAddressController@show_address')->name('show');
+
+		// Route::post('address/add', 'AddressController@add')->name('address.add');
+		// Route::post('address/edit', 'AddressController@edit')->name('address.edit');
+		// Route::post('address/delete', 'AddressController@delete')->name('address.delete');
+		// Route::post('address/select', 'AddressController@select')->name('address.select');
+
+		//////address///////
 		// Route::post('add_address', 'AddressController@address');
+		// Route::get('city', 'AddressController@city');
+		// Route::post('society', 'AddressController@society');
 		// Route::post('show_address', 'AddressController@show_address');
 		// Route::post('select_address', 'AddressController@select_address');
 		// Route::post('edit_address', 'AddressController@edit_add');
 		// Route::post('remove_address', 'AddressController@rem_user_address');
 
-		// Address Management
-		Route::get('address', 'AddressController@index')->name('address.index');
-		Route::post('address/add', 'AddressController@add')->name('address.add');
-		Route::post('address/edit', 'AddressController@edit')->name('address.edit');
-		Route::post('address/delete', 'AddressController@delete')->name('address.delete');
-		Route::post('address/select', 'AddressController@select')->name('address.select');
 
 
+		// Checkout & Orders
+		Route::get('checkout', 'WebOrderController@cart_checkout')->name('cart.checkout');
+		// web.php
+		// Route::get('checkout', 'CartController@checkout')->name('cart.checkout');
 
-         // Checkout & Orders
-		Route::get('checkout/{id}', 'WebOrderController@checkout')->name('checkout');
 		Route::post('place-order', 'OrderController@placeOrder')->name('place.order');
 		Route::get('my-orders', 'OrderController@myOrders')->name('my.orders');
 		Route::get('order/{id}', 'OrderController@orderDetail')->name('order.detail');
@@ -166,14 +151,14 @@ Route::post('/cart/remove/{id}', 'CartController@remove')->name('cart.remove');
 
 
 
-		 //orders//
-    //  Route::post('make_an_order', 'OrderController@order');
-    //  Route::post('ongoing_orders', 'OrderController@ongoing');
-    //  Route::get('cancelling_reasons', 'OrderController@cancel_for');
-    //  Route::post('delete_order', 'OrderController@delete_order');
-    //  Route::post('checkout', 'OrderController@checkout');
-    //  Route::post('completed_orders', 'OrderController@completed_orders');
-    
+		//orders//
+		//  Route::post('make_an_order', 'OrderController@order');
+		//  Route::post('ongoing_orders', 'OrderController@ongoing');
+		//  Route::get('cancelling_reasons', 'OrderController@cancel_for');
+		//  Route::post('delete_order', 'OrderController@delete_order');
+		//  Route::post('checkout', 'OrderController@checkout');
+		//  Route::post('completed_orders', 'OrderController@completed_orders');
+
 
 
 		// Wallet

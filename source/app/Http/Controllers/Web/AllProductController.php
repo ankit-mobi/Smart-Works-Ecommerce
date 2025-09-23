@@ -97,6 +97,8 @@ class AllProductController extends Controller
         // }
     }
 
+
+    
     // side categories products
     public function cate(Request $request)
     {
@@ -220,6 +222,8 @@ class AllProductController extends Controller
     }
 
 
+
+
     // product preview 
     public function product_details(Request $request)
     {
@@ -295,6 +299,7 @@ class AllProductController extends Controller
                     )
                     ->where('product.product_id', $prod_id)
                     // ->where('store_products.store_id', $nearbystore->store_id)
+                    ->where('store_products.store_id', $store_id)
                     ->where('store_products.price', '!=', NULL)
                     ->where('product.hide', 0)
                     ->first();
@@ -325,6 +330,7 @@ class AllProductController extends Controller
                     ->where('product.product_id', $prod_id)
                     ->where('store_products.price', '!=', NULL)
                     // ->where('store_products.store_id',$nearbystore->store_id)
+                    // ->where('store_products.store_id', $store_id)
                     ->where('store_products.store_id', '!=', $store_id) //exclude same store
                     ->get();
 

@@ -50,13 +50,14 @@
                                     @if ($Sprod->stock > 0)
                                         @php
                                             $cart = session('cart', []);
-                                            $inCartQty = $cart[$Sprod->product_id]['quantity'] ?? 0;
+                                            $cartKey = $Sprod->product_id . '-' . $Sprod->store_id;
+                                            $inCartQty = $cart[$cartKey]['quantity'] ?? 0;
                                         @endphp
 
                                         @if ($inCartQty > 0)
                                             <div class="d-flex justify-content-between align-items-center border rounded p-1">
                                                 {{-- Decrease --}}
-                                                <form method="POST" action="{{ route('cart.update', $Sprod->product_id) }}">
+                                                <form method="POST" action="{{ route('cart.update', [$Sprod->product_id, $Sprod->store_id]) }}">
                                                     @csrf
                                                     <input type="hidden" name="action" value="decrease">
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
@@ -66,7 +67,7 @@
                                                 <span class="px-2">{{ $inCartQty }}</span>
 
                                                 {{-- Increase --}}
-                                                <form method="POST" action="{{ route('cart.update', $Sprod->product_id) }}">
+                                                <form method="POST" action="{{ route('cart.update', [$Sprod->product_id, $Sprod->store_id]) }}">
                                                     @csrf
                                                     <input type="hidden" name="action" value="increase">
                                                     <button type="submit" class="btn btn-sm btn-outline-success">+</button>
@@ -74,7 +75,7 @@
                                             </div>
                                         @else
                                             {{-- Add button --}}
-                                            <form method="POST" action="{{ route('cart.add', $Sprod->product_id) }}">
+                                            <form method="POST" action="{{ route('cart.add', [$Sprod->product_id, $Sprod->store_id]) }}">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-outline-success w-100">
                                                     Add + <i class="bi bi-plus-lg"></i>
@@ -89,7 +90,7 @@
             </div>
         </div>
     </div>
-@endforeach
+           @endforeach
 
 
 
@@ -130,14 +131,16 @@
                      <div>
                                     @if ($product->stock > 0)
                                         @php
+                                           
                                             $cart = session('cart', []);
-                                            $inCartQty = $cart[$product->product_id]['quantity'] ?? 0;
+                                            $cartKey = $product->product_id . '-' . $product->store_id;
+                                            $inCartQty = $cart[$cartKey]['quantity'] ?? 0;
                                         @endphp
 
                                         @if ($inCartQty > 0)
                                             <div class="d-flex justify-content-between align-items-center border rounded p-1">
                                                 {{-- Decrease --}}
-                                                <form method="POST" action="{{ route('cart.update', $product->product_id) }}">
+                                                <form method="POST" action="{{ route('cart.update', [$product->product_id, $product->store_id]) }}">
                                                     @csrf
                                                     <input type="hidden" name="action" value="decrease">
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
@@ -147,7 +150,7 @@
                                                 <span class="px-2">{{ $inCartQty }}</span>
 
                                                 {{-- Increase --}}
-                                                <form method="POST" action="{{ route('cart.update', $product->product_id) }}">
+                                                <form method="POST" action="{{ route('cart.update', [$product->product_id, $product->store_id]) }}">
                                                     @csrf
                                                     <input type="hidden" name="action" value="increase">
                                                     <button type="submit" class="btn btn-sm btn-outline-success">+</button>
@@ -155,7 +158,7 @@
                                             </div>
                                         @else
                                             {{-- Add button --}}
-                                            <form method="POST" action="{{ route('cart.add', $product->product_id) }}">
+                                            <form method="POST" action="{{ route('cart.add', [$product->product_id, $product->store_id]) }}">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-outline-success w-100">
                                                     Add + <i class="bi bi-plus-lg"></i>
@@ -170,7 +173,7 @@
             </div>
         </div>
     </div>
-@endforeach
+       @endforeach
 
     
         
@@ -212,13 +215,14 @@
                                     @if ($allprod->stock > 0)
                                         @php
                                             $cart = session('cart', []);
-                                            $inCartQty = $cart[$allprod->product_id]['quantity'] ?? 0;
+                                            $cartKey = $allprod->product_id . '-' . $allprod->store_id;
+                                            $inCartQty = $cart[$cartKey]['quantity'] ?? 0;
                                         @endphp
 
                                         @if ($inCartQty > 0)
                                             <div class="d-flex justify-content-between align-items-center border rounded p-1">
                                                 {{-- Decrease --}}
-                                                <form method="POST" action="{{ route('cart.update', $allprod->product_id) }}">
+                                                <form method="POST" action="{{ route('cart.update',['id' =>$allprod->product_id, 'store_id' => $allprod->store_id]) }}">
                                                     @csrf
                                                     <input type="hidden" name="action" value="decrease">
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
@@ -228,7 +232,7 @@
                                                 <span class="px-2">{{ $inCartQty }}</span>
 
                                                 {{-- Increase --}}
-                                                <form method="POST" action="{{ route('cart.update', $allprod->product_id) }}">
+                                                <form method="POST" action="{{ route('cart.update',['id' =>$allprod->product_id, 'store_id' => $allprod->store_id]) }}">
                                                     @csrf
                                                     <input type="hidden" name="action" value="increase">
                                                     <button type="submit" class="btn btn-sm btn-outline-success">+</button>
@@ -236,7 +240,7 @@
                                             </div>
                                         @else
                                             {{-- Add button --}}
-                                            <form method="POST" action="{{ route('cart.add', $allprod->product_id) }}">
+                                            <form method="POST" action="{{ route('cart.add',['id' =>$allprod->product_id, 'store_id' => $allprod->store_id]) }}">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-outline-success w-100">
                                                     Add + <i class="bi bi-plus-lg"></i>
@@ -251,7 +255,7 @@
             </div>
         </div>
     </div>
-@endforeach
+       @endforeach
 
                         
 

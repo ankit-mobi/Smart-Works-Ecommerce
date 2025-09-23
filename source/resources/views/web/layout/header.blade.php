@@ -74,13 +74,13 @@
 
                 {{-- Cart --}}
                 @php
-    $totalItems = 0;
-    if(session('cart')){
-        foreach(session('cart') as $item){
-            $totalItems += $item['quantity'];
-        }
-    }
-@endphp
+                    $totalItems = 0;
+                    if (session('cart')) {
+                        foreach (session('cart') as $item) {
+                            $totalItems += $item['quantity'];
+                        }
+                    }
+                @endphp
                 <li class="nav-item">
                     <a class="nav-link position-relative" href="#" onclick="openNav()">
                         <i class="fas fa-shopping-cart fs-5"></i> {{-- Font Awesome Cart Icon --}}
@@ -105,101 +105,108 @@
 
     <div class="header_overflow">
         {{-- Check if the cart is not empty --}}
-        @if(session('cart'))
+        @if(session('cart') && count(session('cart')) > 0)
 
             {{-- Loop through each item in the cart --}}
             @foreach (session('cart') as $item)
-
                 <hr style="margin-top: -8px; margin-bottom: -8px;">
 
                 <div class="row" style="padding: 15px 10px 5px 10px;">
+                    {{-- Product image --}}
                     <div class="col-sm-1">
-                        {{-- Assuming 'varient_image' is a column in your database --}}
-                        <img src="{{ asset($item['image']) }}" height="40">
+                        <img src="{{ asset($item['image']) }}" height="40" alt="{{ $item['name'] }}">
                     </div>
 
-                    <div class="col-sm-4">
-                        {{-- You'll need to join with product table to get the name --}}
-                        <p style="font-size: 14px; margin-left: 12px;">{{ $item['name'] ?? 'Product Name' }}</p>
+                    {{-- Product info --}}
+                    <div class="col-sm-6">
+                        <p style="font-size: 14px; margin-left: 12px;">
+                            {{ $item['name'] ?? 'Product Name' }}
+                            <small class="text-muted">(Store: {{ $item['store_id'] }})</small>
+                        </p>
                         <p class="header_para_34">Rs: {{ $item['price'] * $item['quantity'] }}</p>
                         <p class="header_para_34">Quantity: {{ $item['quantity'] }}</p>
                     </div>
 
+                    {{-- Quantity controls --}}
                     <div class="col-sm-3">
                         <div class="d-flex justify-content-center align-items-center rounded p-1">
-                {{-- Decrease --}}
-                <form method="POST" action="{{ route('cart.update', $item['product_id']) }}" class="m-0">
-                    @csrf
-                    <input type="hidden" name="action" value="decrease">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
-                </form>
+                            {{-- Decrease --}}
+                            <form method="POST" action="{{ route('cart.update', [$item['product_id'], $item['store_id']]) }}"
+                                class="m-0">
+                                @csrf
+                                <input type="hidden" name="action" value="decrease">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                            </form>
 
-                {{-- Quantity --}}
-                <span class="px-3">{{ $item['quantity'] }}</span>
+                            {{-- Quantity --}}
+                            <span class="px-3">{{ $item['quantity'] }}</span>
 
-                {{-- Increase --}}
-                <form method="POST" action="{{ route('cart.update', $item['product_id']) }}" class="m-0">
-                    @csrf
-                    <input type="hidden" name="action" value="increase">
-                    <button type="submit" class="btn btn-sm btn-outline-success">+</button>
-                </form>
-            </div>      
+                            {{-- Increase --}}
+                            <form method="POST" action="{{ route('cart.update', [$item['product_id'], $item['store_id']]) }}"
+                                class="m-0">
+                                @csrf
+                                <input type="hidden" name="action" value="increase">
+                                <button type="submit" class="btn btn-sm btn-outline-success">+</button>
+                            </form>
+                        </div>
                     </div>
 
-
-
                     {{-- Remove --}}
-        <div class="col-sm-2 text-end">
-            <form method="POST" action="{{ route('cart.remove', $item['product_id']) }}">
-                @csrf
-                <button type="submit" class="btn btn-sm btn-link text-danger">
-                    <i class="fas fa-times-circle"></i>
-                </button>
-            </form>
-        </div>
+                    <div class="col-sm-2 text-end">
+                        <form method="POST" action="{{ route('cart.remove', [$item['product_id'], $item['store_id']]) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-link text-danger">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             @endforeach
 
         @else
-            {{-- Display message if the cart is empty --}}
-            <p style="text-align: center; padding: 20px;" class="text-uppercase"><b>No items in the cart</b></p>
-            <p style="text-align: center" class="text-muted small mb-2">Please add some of the items in cart that will appear here</p>
-            <br><br>
-            <a href="{{route('products')}}" class="text-center">SHOP NOW</a>
-
+            {{-- Empty cart message --}}
+            <p class="text-center py-3 text-uppercase"><b>No items in the cart</b></p>
+            <p class="text-center text-muted small mb-2">
+                Please add some items to the cart, they will appear here.
+            </p>
+            <div class="text-center">
+                <a href="{{ route('products') }}" class="btn btn-sm btn-outline-primary">Shop Now</a>
+            </div>
         @endif
     </div>
 
+
     @php
-    $totalItems = 0;
-    $grandTotal = 0;
+        $totalItems = 0;
+        $grandTotal = 0;
 
-    if(session('cart')){
-        foreach(session('cart') as $item){
-            $totalItems += $item['quantity'];
-            $grandTotal += $item['price'] * $item['quantity'];
+        if (session('cart')) {
+            foreach (session('cart') as $item) {
+                $totalItems += $item['quantity'];
+                $grandTotal += $item['price'] * $item['quantity'];
+            }
         }
-    }
-@endphp
+    @endphp
 
 
-   @if(session('cart') && count(session('cart')) > 0)
-    <div class="card header_card12">
-        <div class="card-body">
+    @if(session('cart') && count(session('cart')) > 0)
+        <div class="card header_card12">
+            <div class="card-body">
 
-            <p class="header_span99">
-                Total Items : <span style="float: right;">{{ $totalItems }}</span>
-            </p>
+                <p class="header_span99">
+                    Total Items : <span style="float: right;">{{ $totalItems }}</span>
+                </p>
 
-            <p class="header_span99">
-                Total Payable : <span style="float: right;">Rs {{ number_format($grandTotal, 2) }}</span>
-            </p>
+                <p class="header_span99">
+                    Total Payable : <span style="float: right;">Rs {{ number_format($grandTotal, 2) }}</span>
+                </p>
 
-            <button class="btn header_pay_to">Proceed To Pay</button>
+                <a href="{{ route('cart.checkout') }}"><button class="btn header_pay_to"> Proceed To Pay </button></a>
 
+
+            </div>
         </div>
-    </div>
-@endif
+    @endif
 
 </div>
 
@@ -214,55 +221,9 @@
         document.getElementById("mySidepanel").style.width = "0";
     }
 
-    function remove_cart_item() {
-        // remove cart item
-        //  const productId = element.getAttribute('data-product-id');
-
-        //  remove_from_db(productId);
-    }
 
 </script>
 
-{{--
-<script>
-    $(document).ready(function () {
-        $('.add-to-cart-btn').on('click', function (e) {
-            e.preventDefault(); // Stop the default page reload
-
-            let varientId = $(this).data('varient-id');
-            let qty = $(this).data('qty');
-            let url = "{{ route('cart.add') }}";
-            let csrfToken = "{{ csrf_token() }}";
-
-            // Show a loading indicator (optional)
-            $(this).text('Adding...').prop('disabled', true);
-
-            $.ajax({
-                url: url,
-                method: 'POST',
-                data: {
-                    _token: csrfToken,
-                    varient_id: varientId,
-                    qty: qty
-                },
-                success: function (response) {
-
-                    // You can update a cart counter here
-                    $('#cart-count').text(response.cart_count);
-
-                    // Restore the button state
-                    $('.add-to-cart-btn').text('Add to Cart').prop('disabled', false);
-                },
-                error: function (xhr) {
-                    // Handle any errors
-                    console.error(xhr.responseText);
-                    $('.add-to-cart-btn').text('Add to Cart').prop('disabled', false);
-                    alert('An error occurred!');
-                }
-            });
-        });
-    });
-</script> --}}
 
 <script>
     // Voice Search (Web Speech API)

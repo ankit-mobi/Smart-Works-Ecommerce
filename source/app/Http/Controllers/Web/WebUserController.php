@@ -10,7 +10,7 @@ use DB;
 class WebUserController extends Controller
 {
     
-    // pre by me
+
     public function profile()
     {
         $title = "Home";

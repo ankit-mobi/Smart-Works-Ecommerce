@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
-public function add($id)
+public function add(Request $request, $id, $store_id)
 {
+
         $cart = session()->get('cart', []);
 
         $product = DB::table('store_products')
@@ -40,21 +41,25 @@ public function add($id)
                     )
                     ->where('product.product_id', $id)
                     // ->where('store_products.store_id', $nearbystore->store_id)
+                    ->where('store_products.store_id',$store_id)
                     ->where('store_products.price', '!=', NULL)
                     ->where('product.hide', 0)
                     ->first();
 
                     if (!$product) {
-        return back()->withErrors('Product not found or unavailable');
-    }
+                      return back()->withErrors('Product not found or unavailable');
+                     }
+
+
+                    //  Make unique key with product + store
+                     $cartKey = $id . '-' . $store_id;
 
 
         // If product already in cart, just increase quantity
-    if (isset($cart[$id])) {
-        $cart[$id]['quantity']++;
+    if (isset($cart[$cartKey])) {
+        $cart[$cartKey]['quantity']++;
     } else {
-        // Store product details in session
-        $cart[$id] = [
+        $cart[$cartKey] = [
             'product_id'    => $product->product_id,
             'store_id'      => $product->store_id,
             'name'          => $product->product_name,
@@ -70,26 +75,30 @@ public function add($id)
 
     session()->put('cart', $cart);
 
+    return back()->with('success', 'Product added to cart!');
+}
 
-       return back()->with('success', 'Product added to cart!');
-    }
 
-  public function update(Request $request, $id)
+  public function update(Request $request, $product_id, $store_id)
 {
+ 
+
     $cart = session()->get('cart', []);
 
-    if (!isset($cart[$id])) {
+       $cartKey = $product_id . '-' . $store_id;
+
+    if (!isset($cart[$cartKey])) {
         return back()->with('error', 'Product not found in cart');
     }
 
     if ($request->action === 'increase') {
-        $cart[$id]['quantity']++;
+        $cart[$cartKey]['quantity']++;
     } elseif ($request->action === 'decrease') {
-        $cart[$id]['quantity']--;
+        $cart[$cartKey]['quantity']--;
 
         // remove if quantity drops to 0
-        if ($cart[$id]['quantity'] < 1) {
-            unset($cart[$id]);
+        if ($cart[$cartKey]['quantity'] < 1) {
+            unset($cart[$cartKey]);
         }
     }
 
@@ -97,15 +106,18 @@ public function add($id)
     return back();
 }
 
-public function remove($id)
+public function remove($product_id, $store_id)
 {
     $cart = session()->get('cart', []);
-    if (isset($cart[$id])) {
-        unset($cart[$id]);
+
+    $cartKey = $product_id . '-' . $store_id; // composite key
+
+    if (isset($cart[$cartKey])) {
+        unset($cart[$cartKey]);
         session()->put('cart', $cart);
     }
-    return back();
+
+    return back()->with('success','Product removed from cart!');
 }
 
- 
 }

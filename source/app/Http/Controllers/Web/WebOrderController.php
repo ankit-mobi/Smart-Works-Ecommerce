@@ -7,7 +7,7 @@ use DB;
 use Illuminate\Support\Carbon;
 use Session;
 use Illuminate\Http\Request;
-
+use App\http\Controllers\Web\WebAddressController;
 
 class WebOrderController extends Controller
 {
@@ -187,7 +187,9 @@ class WebOrderController extends Controller
     return view('web.product.purchase', compact('title', 'logo', 'product', 'user'));
   }
 
-  public function cartcheckout()
+
+  // cart-check-out
+  public function cart_checkout(WebAddressController $address)
   {
 
     $title = "Home";
@@ -200,18 +202,22 @@ class WebOrderController extends Controller
       ->where('user_phone', $user_phone)
       ->first();
 
-    $items = DB::table('cart_item as ct')
-      ->join('product_varient as pv', 'pv.varient_id', '=', 'ct.varient_id')
-      ->join('product', 'pv.product_id', '=', 'product.product_id')
-      ->select(
-        'ct.*',
-        'pv.varient_image',
-        'product.product_name',
-        'product.product_id',
-        'pv.description'
-      )
-      ->get();
+    $cart = session()->get('cart', []);
+    if (empty($cart)) {
+        return redirect()->route('products')->with('error', 'Your cart is empty!');
+    }
 
-    return view('web.product.cart-check-out', compact('title', 'logo', 'items', 'user'));
-  }
+    // Calculate totals
+    $totalAmount = 0;
+    $totalItems = 0;
+
+    foreach ($cart as $item) {
+        $totalAmount += $item['price'] * $item['quantity'];
+        $totalItems += $item['quantity'];
+    }
+
+    $addresses = $address->show_address();
+
+    return view('web.product.cart-check-out', compact('title', 'logo', 'user_phone', 'user' ,'cart', 'totalAmount', 'totalItems', 'addresses'));
+}
 }
