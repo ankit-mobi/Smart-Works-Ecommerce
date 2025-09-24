@@ -189,7 +189,7 @@ class WebOrderController extends Controller
 
 
   // cart-check-out
-  public function cart_checkout(WebAddressController $address)
+  public function cart_checkout(WebAddressController $address) 
   {
 
     $title = "Home";
@@ -201,6 +201,12 @@ class WebOrderController extends Controller
     $user = DB::table('users')
       ->where('user_phone', $user_phone)
       ->first();
+
+   if (!$user) {
+    return redirect()->route('userLogin')->with('error', 'User not registered');
+   }
+  
+
 
     $cart = session()->get('cart', []);
     if (empty($cart)) {
@@ -217,7 +223,8 @@ class WebOrderController extends Controller
     }
 
     $addresses = $address->show_address();
+    // return $addresses;
 
-    return view('web.product.cart-check-out', compact('title', 'logo', 'user_phone', 'user' ,'cart', 'totalAmount', 'totalItems', 'addresses'));
+    return view('web.orders.cart_check_out', compact('title', 'logo', 'user_phone', 'user' ,'cart', 'totalAmount', 'totalItems', 'addresses')); 
 }
 }

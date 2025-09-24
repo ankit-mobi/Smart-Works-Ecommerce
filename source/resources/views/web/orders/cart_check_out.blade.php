@@ -28,18 +28,24 @@
                 <div class="card shadow-sm mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center bg-light">
                         <h5 class="mb-0">2. Delivery Address</h5>
-                        {{-- <a href="{{ route('address.index') }}" class="btn btn-link btn-sm">Change</a> --}}
+                        <a href="{{ route('profile') }}" class="btn btn-link btn-sm">Change</a>
                     </div>
                     <div class="card-body">
-                        @if($addresses = null)
-                            <p class="fw-bold mb-1">{{ $address->receiver_name }} ({{ $address->receiver_phone }})</p>
-                            <p class="mb-1">
-                                {{ $address->house_no }}, {{ $address->society }}, {{ $address->landmark }} <br>
-                                {{ $address->city }}, {{ $address->state }} - {{ $address->pincode }}
-                            </p>
-                            <span class="badge bg-success">Selected</span>
+                        @if($addresses->isNotEmpty())
+                            @foreach ($addresses as $address)
+                                @if ($address->select_status == 1)
+                                    <p class="fw-bold mb-1">{{ $address->receiver_name }}</p>
+                                    <p class="fw-bold mb-1">{{ $address->receiver_phone }}</p>
+                                    <p class="mb-1">
+                                        {{ $address->house_no }}, {{ $address->society }}, {{ $address->landmark }} <br>
+                                        {{ $address->city }}, {{ $address->state }} - {{ $address->pincode }}
+                                    </p>
+                                    <span class="badge bg-success">Selected</span>
+                                @endif
+                            @endforeach
+
                         @else
-                            {{-- <p class="text-muted">No address selected. Please <a href="{{ route('address.index') }}">add/select --}}
+                            <p class="text-muted">No address selected. Please <a href="{{ route('profile') }}">add/select
                                     an address</a>.</p>
                         @endif
                     </div>
@@ -73,6 +79,53 @@
                         @endforeach
                     </div>
                 </div>
+
+
+               <!-- Step 4: Choose Delivery Slot -->
+<div class="card shadow-sm border-0 rounded-3 mb-4">
+    <div class="card-header bg-light d-flex align-items-center">
+        <h5 class="mb-0 text-primary">
+            <i class="bi bi-calendar-event me-2"></i> 4. Choose a Delivery Slot
+        </h5>
+    </div>
+    <div class="card-body">
+
+        <div class="row g-4 align-items-start">
+
+            <!-- Date Picker -->
+            <div class="col-md-6">
+                <label for="delivery_date" class="form-label fw-semibold">
+                    Select Delivery Date <span class="text-muted">(Next 10 days)</span>
+                </label>
+                <input type="date" 
+                       name="delivery_date" 
+                       id="delivery_date" 
+                       class="form-control shadow-sm"
+                       min="{{ now()->toDateString() }}" 
+                       max="{{ now()->addDays(9)->toDateString()}}" 
+                       required>
+                @error('delivery_date')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <!-- Timeslot container -->
+            <div class="col-md-6" id="timeslot-container">
+                <div class="alert alert-secondary text-center py-3 mb-0">
+                    <i class="bi bi-clock me-1"></i>
+                    Please select a delivery date to see available time slots.
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
             </div>
 
             <!-- Right Section: Price Details -->
@@ -127,4 +180,59 @@
 
         </div>
     </div>
+
+    <script>
+        document.getElementById('delivery_date').addEventListener('change',function(){
+            const selected_date = this.value;
+            const timeslotContainer = document.getElementById('timeslot-container');
+
+            if(selected_date){
+                timeslotContainer.innerHTML = '<p class="text-info"> Loading time slots...</p>';
+
+               fetch('{{ route('getSlots') }}', {
+    method: 'POST', 
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    },
+    body: JSON.stringify({ selected_date: selected_date })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.status === '1') {
+        let timeslotHtml = `
+            <label class="form-label fw-bold">Select a Time Slot</label>
+            <div class="list-group shadow-sm rounded">
+        `;
+
+        data.data.forEach(slot => {
+            timeslotHtml += `
+                <label class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <input type="radio" name="delivery_timeslot" value="${slot}" required class="form-check-input me-2">
+                        <span class="fw-medium">${slot}</span>
+                    </div>
+                    <span class="badge bg-success rounded-pill">Available</span>
+                </label>
+            `;
+        });
+
+        timeslotHtml += `</div>`;
+        timeslotContainer.innerHTML = timeslotHtml;
+    } else {
+        timeslotContainer.innerHTML = `<p class="text-danger fw-bold">${data.message}</p>`;
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+    timeslotContainer.innerHTML = `<p class="text-danger fw-bold">⚠ Failed to load time slots.</p>`;
+});
+
+
+
+            }
+        });
+    </script>
+
+
 @endsection

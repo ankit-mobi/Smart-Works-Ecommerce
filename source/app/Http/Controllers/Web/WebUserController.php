@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Web\WebAddressController;
 use Session;
 use DB;
 
@@ -11,7 +12,7 @@ class WebUserController extends Controller
 {
     
 
-    public function profile()
+    public function profile(WebAddressController $address)
     {
         $title = "Home";
         $logo = DB::table('tbl_web_setting')
@@ -22,9 +23,10 @@ class WebUserController extends Controller
         $user = DB::table('users')
             ->where('user_phone', $user_phone)
             ->first();
-        $addresses = DB::table('address')
-        ->where('address.user_id','user.user_id')
-        ->get();
+            
+    $addresses = $address->show_address();
+
+        
 
         $orders = DB::table('orders')
         ->where('orders.user_id','user.user_id')

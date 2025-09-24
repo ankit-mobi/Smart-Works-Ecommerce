@@ -7,19 +7,83 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Session;
 use DB;
+use Carbon\Carbon;
 
 class WebAddressController extends Controller
 {
 
+
+    public function add_address(Request $request)
+    {
+        // Get the user's phone number from the session
+        $user_phone = Session::get('bamaCust');
+
+        // Find the user in the database using the phone number
+        $user = DB::table('users')
+            ->where('user_phone', $user_phone)
+            ->first();
+
+        // Check if a user was found
+        if ($user) {
+            $user_id = $user->user_id;
+        } else {
+            return redirect()->route('userLogin')->withErrors('User not registered');
+        }
+        
+
+
+        $unselect = DB::table('address')
+            ->where('user_id', $user_id)
+            ->get();
+
+        if (count($unselect) > 0) {
+            $unselect = DB::table('address')
+                ->where('user_id', $user_id)
+                ->update(['select_status' => 0]);
+        }
+
+
+        $insertaddress = DB::table('address')->insert([
+            'user_id'       => $user_id,
+            'receiver_name' => $request->receiver_name,
+            'receiver_phone' => $request->receiver_phone,
+            'city' => $request->city,
+            'society'       => $request->society,
+            'house_no'      => $request->house_no,
+            'landmark'      => $request->landmark,
+            'state'         => $request->state,
+            'pincode'       => $request->pincode,
+            'select_status' => 1,
+            'lat'           => $request->lat,
+            'lng'           => $request->lng,
+            'added_at'      => Carbon::now()
+        ]);
+
+
+        if ($insertaddress) {
+            return redirect()->route('profile')->with('success','address added');
+        } else {
+            return redirect()->route('profile')->with('erroe','something went wrong');
+        }
+    }
+
+
     public function show_address()
     {
-        $cust_phone = Session::get('bamaCust');
-        $user_id = DB::table('users')
-            ->select(
-                'users.user_id'
-            )
-            ->where('user_phone', $cust_phone)
+       
+        $user_phone = Session::get('bamaCust');
+        $user = DB::table('users')
+            ->where('user_phone', $user_phone)
             ->first();
+
+        // Check if a user was found
+        // if ($user) {
+            $user_id = $user->user_id;
+        // } else {
+        //     return redirect()->route('userLogin')->withErrors('User not registered');
+        // }
+
+        
 
 
         // $user_id = $request->user_id;
@@ -56,11 +120,16 @@ class WebAddressController extends Controller
                     ->where('select_status', 1)
                     ->update(['select_status' => 0]);
             }
-            $message = array('status' => '1', 'message' => 'Address list', 'data' => $address);
-            return $message;
+            // $message = array('status' => '1', 'message' => 'Address list', 'data' => $address);
+            // return $message;
+            return $address;
         } else {
-            $message = array('status' => '0', 'message' => 'Address not found! Add Address', 'data' => []);
-            return $message;
+            // $message = array('status' => '0', 'message' => 'Address not found! Add Address', 'data' => []);
+            // return $message;
+            return $address;
         }
     }
+
+
+
 }

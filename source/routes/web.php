@@ -49,8 +49,6 @@ Route::get('/clear-cache', function () {
 // });
 
 
-//Route::get('delivery_info', 'AppController@delivery_info');  to select all time slot 
-
 
 Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'], function () {
 
@@ -110,26 +108,38 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 		// Profile
 		Route::get('profile', 'WebUserController@profile')->name('profile');
 		// profile edit
-		Route::post('profile/update', 'UserController@update')->name('profile.update');
+		Route::post('profile/update', 'WebUserController@update')->name('profile.update');
 
 
 		// Coupons
 		// Route::post('coupon/apply', 'CouponController@apply')->name('coupon.apply');
-		// Route::get('coupon/list', 'CouponController@list')->name('coupon.list');
+		// Route::get('coupon/list', 'CouponController@list')->name('coupon.list');cart.checkout
+
+		 /////time slot////// 
+        //  Route::post('timeslot', 'WebTimeslotController@timeslot')->name('timeslotfor'); 
+		 Route::post('timeslot', 'WebTimeslotController@timeslot')->name('getSlots');
+
+		//Delivery fee info////
+        Route::get('delivery_info', 'AppController@delivery_info');
 
 
 
-		// Address Management
-		// Route::get('address', 'AddressController@index')->name('address.index');
-		Route::post('show_address', 'WebAddressController@show_address')->name('show');
 
-		// Route::post('address/add', 'AddressController@add')->name('address.add');
+
+		// Address Management                                                      
+		// Route::get('address', 'WebAddressController@index')->name('address.index');
+		Route::get('show_address', 'WebAddressController@show_address')->name('address.show');
+		// Route::post('show_address', 'AddressController@show_address');
+		Route::post('address_add', 'WebAddressController@add_address')->name('address.add');
+
+		//  Route::post('add_address', 'AddressController@address');
 		// Route::post('address/edit', 'AddressController@edit')->name('address.edit');
 		// Route::post('address/delete', 'AddressController@delete')->name('address.delete');
 		// Route::post('address/select', 'AddressController@select')->name('address.select');
 
 		//////address///////
 		// Route::post('add_address', 'AddressController@address');
+		
 		// Route::get('city', 'AddressController@city');
 		// Route::post('society', 'AddressController@society');
 		// Route::post('show_address', 'AddressController@show_address');
