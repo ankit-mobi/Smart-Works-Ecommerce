@@ -72,7 +72,7 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 
 	// Home & Pages Access without login
 	Route::get('/', 'WebHomeController@web')->name('webhome'); //pre        //done
-	Route::get('about', 'WebHomeController@aboutus')->name('webabout');   //pre  //doneF
+	Route::get('about', 'WebHomeController@aboutus')->name('webabout');   //pre  //done
 	Route::get('terms', 'WebHomeController@terms')->name('terms');  //pre   //done
 	Route::get('contact', 'WebHomeController@contact')->name('contact');
 
@@ -113,14 +113,14 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 
 		// Coupons
 		// Route::post('coupon/apply', 'CouponController@apply')->name('coupon.apply');
-		// Route::get('coupon/list', 'CouponController@list')->name('coupon.list');cart.checkout
+		// Route::get('coupon/list', 'CouponController@list')->name('coupon.list');
 
 		 /////time slot////// 
         //  Route::post('timeslot', 'WebTimeslotController@timeslot')->name('timeslotfor'); 
-		 Route::post('timeslot', 'WebTimeslotController@timeslot')->name('getSlots');
+		 Route::post('timeslot', 'WebTimeslotController@timeslot')->name('getSlots'); 
 
 		//Delivery fee info////
-        Route::get('delivery_info', 'AppController@delivery_info');
+        Route::get('delivery_info', 'WebController@delivery_info');
 
 
 
@@ -128,8 +128,7 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 
 		// Address Management                                                      
 		// Route::get('address', 'WebAddressController@index')->name('address.index');
-		Route::get('show_address', 'WebAddressController@show_address')->name('address.show');
-		// Route::post('show_address', 'AddressController@show_address');
+		// Route::get('show_address', 'WebAddressController@show_address')->name('address.show');
 		Route::post('address_add', 'WebAddressController@add_address')->name('address.add');
 
 		//  Route::post('add_address', 'AddressController@address');
@@ -147,18 +146,17 @@ Route::group(['prefix' => 'web', ['middleware' => ['XSS']], 'namespace' => 'Web'
 		// Route::post('edit_address', 'AddressController@edit_add');
 		// Route::post('remove_address', 'AddressController@rem_user_address');
 
+		
+		//////minimum/maximum order value///////
+        Route::get('minmax', 'WebCartvalueController@minmax'); 
 
 
 		// Checkout & Orders
-		Route::get('checkout', 'WebOrderController@cart_checkout')->name('cart.checkout');
-		// web.php
-		// Route::get('checkout', 'CartController@checkout')->name('cart.checkout');
-
-		Route::post('place-order', 'OrderController@placeOrder')->name('place.order');
-		Route::get('my-orders', 'OrderController@myOrders')->name('my.orders');
-		Route::get('order/{id}', 'OrderController@orderDetail')->name('order.detail');
-		Route::post('order/cancel', 'OrderController@cancelOrder')->name('order.cancel');
-
+		Route::get('order_summary', 'WebOrderController@order_summary')->name('order.summary');
+		Route::post('make_an_order', 'WebOrderController@order')->name('make.order');
+		// Route::get('my-orders', 'OrderController@myOrders')->name('my.orders');
+		// Route::get('order/{id}', 'OrderController@orderDetail')->name('order.detail');
+		// Route::post('order/cancel', 'OrderController@cancelOrder')->name('order.cancel');
 
 
 		//orders//

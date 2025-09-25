@@ -201,7 +201,7 @@
                     Total Payable : <span style="float: right;">Rs {{ number_format($grandTotal, 2) }}</span>
                 </p>
 
-                <a href="{{ route('cart.checkout') }}"><button class="btn header_pay_to"> Proceed To Pay </button></a>
+                <a href="{{ route('order.summary') }}"><button class="btn header_pay_to"> Proceed To Pay </button></a>
 
 
             </div>

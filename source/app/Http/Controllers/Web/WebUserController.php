@@ -24,7 +24,7 @@ class WebUserController extends Controller
             ->where('user_phone', $user_phone)
             ->first();
             
-    $addresses = $address->show_address();
+        $addresses = $address->show_address();
 
         
 
